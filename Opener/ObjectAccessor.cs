@@ -81,6 +81,12 @@ namespace Opener
             StringCollection body = _scripter.Script(new Urn[] { urn });
             String[] bodyArray = new String[body.Count];
             body.CopyTo(bodyArray, 0);
+            // hack to get alter instead of create
+            string createPrefix = "CREATE ";
+            if (bodyArray.Last().StartsWith(createPrefix))
+            {
+                bodyArray[bodyArray.Length-1] = "ALTER " + bodyArray.Last().Substring(createPrefix.Length);
+            }
             return String.Join("\nGO\n", bodyArray);
         }
     }
