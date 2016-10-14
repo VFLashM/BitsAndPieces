@@ -16,6 +16,20 @@ namespace Opener
         Server _server;
         Scripter _scripter;
 
+        public class ObjectInfo
+        {
+            readonly public string name;
+            readonly public Urn urn;
+            readonly public string type;
+
+            public ObjectInfo(string name, Urn urn, string type)
+            {
+                this.name = name;
+                this.urn = urn;
+                this.type = type;
+            }
+        }
+
         public ObjectAccessor()
         {
             UIConnectionInfo uiConnectionInfo = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
@@ -38,16 +52,17 @@ namespace Opener
             _scripter.Options.IncludeHeaders = true;
         }
 
-        public List<Urn> GetObjects()
+        public List<ObjectInfo> GetObjects()
         {
-            var result = new List<Urn>();
+            var result = new List<ObjectInfo>();
             foreach (Database database in _server.Databases)
             {
                 if (database.Name == "SRA_Main" || database.Name == "SRA_Track")
                 {
                     foreach (StoredProcedure proc in database.StoredProcedures)
                     {
-                        result.Add(proc.Urn);
+                        string name = database.Name + "." + proc.Schema + "." + proc.Name;
+                        result.Add(new ObjectInfo(name, proc.Urn, "procedure"));
                     }
                 }
             }

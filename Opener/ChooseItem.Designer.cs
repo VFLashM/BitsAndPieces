@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.list = new Opener.FilterList();
-            this.text = new Opener.FilterText();
+            this.list = new System.Windows.Forms.ListBox();
+            this.text = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // list
@@ -42,26 +42,24 @@
             this.list.ItemHeight = 20;
             this.list.Location = new System.Drawing.Point(12, 12);
             this.list.Name = "list";
-            this.list.Size = new System.Drawing.Size(589, 324);
-            this.list.TabIndex = 1;
-            this.list.TabStop = false;
-            this.list.UseTabStops = false;
+            this.list.Size = new System.Drawing.Size(628, 364);
+            this.list.TabIndex = 0;
             // 
             // text
             // 
             this.text.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.text.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.text.Location = new System.Drawing.Point(12, 351);
+            this.text.Location = new System.Drawing.Point(12, 391);
             this.text.Name = "text";
-            this.text.Size = new System.Drawing.Size(589, 27);
-            this.text.TabIndex = 0;
+            this.text.Size = new System.Drawing.Size(628, 27);
+            this.text.TabIndex = 1;
             // 
             // ChooseItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(613, 390);
+            this.ClientSize = new System.Drawing.Size(652, 430);
             this.Controls.Add(this.text);
             this.Controls.Add(this.list);
             this.Name = "ChooseItem";
@@ -73,7 +71,8 @@
 
         #endregion
 
-        private FilterList list;
-        private FilterText text;
+        private System.Windows.Forms.ListBox list;
+        private System.Windows.Forms.TextBox text;
+
     }
 }

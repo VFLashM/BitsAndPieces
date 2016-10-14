@@ -98,12 +98,6 @@
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FilterList.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="FilterText.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ObjectAccessor.cs" />
     <Compile Include="OpenedFileManager.cs" />
     <Compile Include="QuickOpen.cs" />

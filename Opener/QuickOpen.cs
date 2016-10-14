@@ -14,9 +14,9 @@ namespace Opener
             var objects = accessor.GetObjects();
 
             var strToUrn = new Dictionary<string, Urn>();
-            foreach (var urn in objects)
+            foreach (var obj in objects)
             {
-                strToUrn[urn.ToString()] = urn;
+                strToUrn[obj.name] = obj.urn;
             }
 
             var choose = new ChooseItem(strToUrn.Keys.ToArray());
