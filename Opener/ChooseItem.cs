@@ -43,6 +43,10 @@ namespace Opener
                     }
                 }
             }
+            if (list.Items.Count > 0)
+            {
+                list.SelectedIndex = 0;
+            }
         }
 
         void text_TextChanged(object sender, EventArgs e)

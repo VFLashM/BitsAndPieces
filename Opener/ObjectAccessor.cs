@@ -59,10 +59,15 @@ namespace Opener
             {
                 if (database.Name == "SRA_Main" || database.Name == "SRA_Track")
                 {
-                    foreach (StoredProcedure proc in database.StoredProcedures)
+                    foreach (StoredProcedure obj in database.StoredProcedures)
                     {
-                        string name = database.Name + "." + proc.Schema + "." + proc.Name;
-                        result.Add(new ObjectInfo(name, proc.Urn, "procedure"));
+                        string name = database.Name + "." + obj.Schema + "." + obj.Name;
+                        result.Add(new ObjectInfo(name, obj.Urn, "procedure"));
+                    }
+                    foreach (UserDefinedFunction obj in database.UserDefinedFunctions)
+                    {
+                        string name = database.Name + "." + obj.Schema + "." + obj.Name;
+                        result.Add(new ObjectInfo(name, obj.Urn, "function"));
                     }
                 }
             }
