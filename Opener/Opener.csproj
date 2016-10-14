@@ -80,6 +80,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -88,11 +89,24 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ChooseItem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChooseItem.Designer.cs">
+      <DependentUpon>ChooseItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FilterList.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FilterText.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ObjectAccessor.cs" />
     <Compile Include="OpenedFileManager.cs" />
+    <Compile Include="QuickOpen.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE">
@@ -157,6 +171,11 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ChooseItem.resx">
+      <DependentUpon>ChooseItem.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
