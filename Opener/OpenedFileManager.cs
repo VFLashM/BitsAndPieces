@@ -58,6 +58,14 @@ namespace Opener
                 var script = ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql) as SqlScriptEditorControl;
                 script.EditorText = text;
                 _openedDocuments[key] = _applicationObject.ActiveDocument;
+
+                string fullPath = Properties.Settings.ResolveProjectRoot();
+                if (!fullPath.EndsWith("\\")) 
+                {
+                    fullPath += '\\';
+                }
+                fullPath += key.Replace('.', '\\') + ".sql";
+                _applicationObject.ActiveDocument.Save(fullPath);
             }
         }
     }
