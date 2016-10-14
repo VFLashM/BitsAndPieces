@@ -16,7 +16,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\AppData\Roaming\Microsoft\MSEnvShared\Addins\</OutputPath>
+    <OutputPath>$(APPDATA)\Microsoft\MSEnvShared\Addins\</OutputPath>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -111,7 +111,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Opener.AddIn" />
+    <Content Include="Opener.AddIn">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
