@@ -8,14 +8,18 @@ namespace Opener.Properties {
     //  The SettingsLoaded event is raised after the setting values are loaded.
     //  The SettingsSaving event is raised before the setting values are saved.
     internal sealed partial class Settings {
-        
-        public Settings() {
-            // // To add event handlers for saving and changing settings, uncomment the lines below:
-            //
-            // this.SettingChanging += this.SettingChangingEventHandler;
-            //
-            // this.SettingsSaving += this.SettingsSavingEventHandler;
-            //
+
+        public static void CheckAndSave()
+        {
+            try
+            {
+                ResolveProjectRoot();
+                Default.Save();
+            }
+            catch (Error e)
+            {
+                e.Show();
+            }
         }
 
         public static string ResolveProjectRoot()
@@ -27,15 +31,11 @@ namespace Opener.Properties {
             }
             return rootPath;
         }
-        
-        /*
-        private void SettingChangingEventHandler(object sender, System.Configuration.SettingChangingEventArgs e) {
-            // 
+
+        protected override void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            base.OnPropertyChanged(sender, e);
+            Save();
         }
-        
-        private void SettingsSavingEventHandler(object sender, System.ComponentModel.CancelEventArgs e) {
-            // Add code to handle the SettingsSaving event here.
-        }
-         */
     }
 }

@@ -14,21 +14,6 @@ namespace Opener
         public Configuration()
         {
             InitializeComponent();
-
-            this.VisibleChanged += new EventHandler(Configuration_VisibleChanged);
-        }
-
-        void Configuration_VisibleChanged(object sender, EventArgs ev)
-        {
-            try
-            {
-                Properties.Settings.ResolveProjectRoot();
-                Properties.Settings.Default.Save();
-            }
-            catch (Error e)
-            {
-                e.Show();
-            }
         }
     }
 }

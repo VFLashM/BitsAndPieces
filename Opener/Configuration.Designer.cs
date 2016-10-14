@@ -28,60 +28,60 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.rootTextBox = new System.Windows.Forms.TextBox();
+            this.databasesTextBox = new System.Windows.Forms.TextBox();
+            this.rootLabel = new System.Windows.Forms.Label();
+            this.databasesLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // textBox1
+            // rootTextBox
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.rootTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Opener.Properties.Settings.Default, "ProjectRoot", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.textBox1.Location = new System.Drawing.Point(220, 3);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(262, 22);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.Text = global::Opener.Properties.Settings.Default.ProjectRoot;
+            this.rootTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Opener.Properties.Settings.Default, "ProjectRoot", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.rootTextBox.Location = new System.Drawing.Point(220, 3);
+            this.rootTextBox.Name = "rootTextBox";
+            this.rootTextBox.Size = new System.Drawing.Size(262, 22);
+            this.rootTextBox.TabIndex = 0;
+            this.rootTextBox.Text = global::Opener.Properties.Settings.Default.ProjectRoot;
             // 
-            // textBox2
+            // databasesTextBox
             // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.databasesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Opener.Properties.Settings.Default, "Databases", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.textBox2.Location = new System.Drawing.Point(220, 31);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(262, 22);
-            this.textBox2.TabIndex = 1;
-            this.textBox2.Text = global::Opener.Properties.Settings.Default.Databases;
+            this.databasesTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Opener.Properties.Settings.Default, "Databases", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.databasesTextBox.Location = new System.Drawing.Point(220, 31);
+            this.databasesTextBox.Name = "databasesTextBox";
+            this.databasesTextBox.Size = new System.Drawing.Size(262, 22);
+            this.databasesTextBox.TabIndex = 1;
+            this.databasesTextBox.Text = global::Opener.Properties.Settings.Default.Databases;
             // 
-            // label1
+            // rootLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 6);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 17);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Project root:";
+            this.rootLabel.AutoSize = true;
+            this.rootLabel.Location = new System.Drawing.Point(3, 6);
+            this.rootLabel.Name = "rootLabel";
+            this.rootLabel.Size = new System.Drawing.Size(85, 17);
+            this.rootLabel.TabIndex = 2;
+            this.rootLabel.Text = "Project root:";
             // 
-            // label2
+            // databasesLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 34);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(211, 17);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Comma separated database list:";
+            this.databasesLabel.AutoSize = true;
+            this.databasesLabel.Location = new System.Drawing.Point(3, 34);
+            this.databasesLabel.Name = "databasesLabel";
+            this.databasesLabel.Size = new System.Drawing.Size(211, 17);
+            this.databasesLabel.TabIndex = 3;
+            this.databasesLabel.Text = "Comma separated database list:";
             // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.databasesLabel);
+            this.Controls.Add(this.rootLabel);
+            this.Controls.Add(this.databasesTextBox);
+            this.Controls.Add(this.rootTextBox);
             this.Name = "Configuration";
             this.Size = new System.Drawing.Size(485, 138);
             this.ResumeLayout(false);
@@ -91,9 +91,9 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox rootTextBox;
+        private System.Windows.Forms.TextBox databasesTextBox;
+        private System.Windows.Forms.Label rootLabel;
+        private System.Windows.Forms.Label databasesLabel;
     }
 }
