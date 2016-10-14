@@ -59,7 +59,7 @@ namespace Opener
                 script.EditorText = text;
                 _openedDocuments[key] = _applicationObject.ActiveDocument;
 
-                string fullPath = Properties.Settings.ResolveProjectRoot();
+                string fullPath = Properties.Settings.Default.ResolveProjectRoot();
                 if (!fullPath.EndsWith("\\")) 
                 {
                     fullPath += '\\';

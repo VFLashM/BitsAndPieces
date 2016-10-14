@@ -55,9 +55,11 @@ namespace Opener
         public List<ObjectInfo> GetObjects()
         {
             var result = new List<ObjectInfo>();
+            string[] databases = Properties.Settings.Default.GetDatabases();
+
             foreach (Database database in _server.Databases)
             {
-                if (database.Name == "SRA_Main" || database.Name == "SRA_Track")
+                if (databases.Contains(database.Name))
                 {
                     foreach (StoredProcedure obj in database.StoredProcedures)
                     {

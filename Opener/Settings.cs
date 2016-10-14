@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Opener.Properties {
     
     
@@ -13,7 +16,8 @@ namespace Opener.Properties {
         {
             try
             {
-                ResolveProjectRoot();
+                Default.ResolveProjectRoot();
+                Default.GetDatabases();
                 Default.Save();
             }
             catch (Error e)
@@ -22,14 +26,26 @@ namespace Opener.Properties {
             }
         }
 
-        public static string ResolveProjectRoot()
+        public string ResolveProjectRoot()
         {
-            string rootPath = Environment.ExpandEnvironmentVariables(Default.ProjectRoot);
+            string rootPath = Environment.ExpandEnvironmentVariables(ProjectRoot);
             if (!System.IO.Path.IsPathRooted(rootPath))
             {
                 throw new Error("Project root path is not absolute:\n" + rootPath + "\n\nChange it in Tools->Options->Bits and Pieces->Opener", "Configuration error");
             }
             return rootPath;
+        }
+
+        public string[] GetDatabases()
+        {
+            char[] separators = { ',' };
+            var parts = Databases.Split(separators).ToList();
+            var result = parts.Select(db => db.Trim()).Where(s => !String.IsNullOrWhiteSpace(s)).ToList();
+            if (result.Count == 0)
+            {
+                throw new Error("No databases specified\nList databases in Tools->Options->Bits and Pieces->Opener", "Configuration error");
+            }
+            return result.ToArray();
         }
 
         protected override void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
