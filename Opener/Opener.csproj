@@ -106,6 +106,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Error.cs" />
+    <Compile Include="GoTo.cs" />
     <Compile Include="ObjectAccessor.cs" />
     <Compile Include="OpenedFileManager.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
