@@ -14,7 +14,7 @@ namespace Opener
         private string[] _values;
         private bool _truncated = false;
 
-        public ChooseItem(string[] values)
+        public ChooseItem(string[] values, string title)
         {
             InitializeComponent();
             KeyPreview = true;
@@ -24,6 +24,7 @@ namespace Opener
 
             list.DoubleClick += new EventHandler(list_DoubleClick);
             text.TextChanged += new EventHandler(text_TextChanged);
+            Text = title;
         }
 
         void UpdateList()

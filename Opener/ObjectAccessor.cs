@@ -13,6 +13,7 @@ namespace Opener
 {
     class ObjectAccessor
     {
+        string _serverName;
         Server _server;
         Scripter _scripter;
 
@@ -39,6 +40,7 @@ namespace Opener
             connectionInfo.UserName = uiConnectionInfo.UserName;
             connectionInfo.Password = uiConnectionInfo.Password;
             connectionInfo.UseIntegratedSecurity = String.IsNullOrEmpty(uiConnectionInfo.Password);
+            _serverName = connectionInfo.ServerName;
 
             ServerConnection connection = new ServerConnection(connectionInfo);
             connection.Connect();
@@ -50,6 +52,11 @@ namespace Opener
             _scripter.Options.IncludeDatabaseRoleMemberships = true;
             _scripter.Options.IncludeFullTextCatalogRootPath = true;
             _scripter.Options.IncludeHeaders = true;
+        }
+
+        public string ServerName()
+        {
+            return _serverName;
         }
 
         public List<ObjectInfo> GetObjects()

@@ -19,7 +19,8 @@ namespace Opener
                 strToUrn[obj.name] = obj.urn;
             }
 
-            var choose = new ChooseItem(strToUrn.Keys.ToArray());
+            string title = "Choose object on " + accessor.ServerName();
+            var choose = new ChooseItem(strToUrn.Keys.ToArray(), title);
             if (choose.ShowDialog() != System.Windows.Forms.DialogResult.OK)
             {
                 return false;
