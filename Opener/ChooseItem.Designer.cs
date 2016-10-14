@@ -43,7 +43,8 @@
             this.list.Location = new System.Drawing.Point(12, 12);
             this.list.Name = "list";
             this.list.Size = new System.Drawing.Size(628, 364);
-            this.list.TabIndex = 0;
+            this.list.TabIndex = 1;
+            this.list.TabStop = false;
             // 
             // text
             // 
@@ -53,7 +54,7 @@
             this.text.Location = new System.Drawing.Point(12, 391);
             this.text.Name = "text";
             this.text.Size = new System.Drawing.Size(628, 27);
-            this.text.TabIndex = 1;
+            this.text.TabIndex = 0;
             // 
             // ChooseItem
             // 
@@ -63,6 +64,7 @@
             this.Controls.Add(this.text);
             this.Controls.Add(this.list);
             this.Name = "ChooseItem";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ChooseItem";
             this.ResumeLayout(false);
             this.PerformLayout();
