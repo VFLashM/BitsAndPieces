@@ -29,6 +29,12 @@ namespace Opener
                 this.urn = urn;
                 this.type = type;
             }
+            public ObjectInfo(string database, ScriptSchemaObjectBase obj, string type)
+            {
+                this.name = database + "." + obj.Schema + "." + obj.Name;
+                this.urn = obj.Urn;
+                this.type = type;
+            }
         }
 
         public ObjectAccessor()
@@ -86,23 +92,35 @@ namespace Opener
                 {
                     foreach (StoredProcedure obj in database.StoredProcedures)
                     {
-                        string name = database.Name + "." + obj.Schema + "." + obj.Name;
-                        result.Add(new ObjectInfo(name, obj.Urn, "procedure"));
+                        result.Add(new ObjectInfo(database.Name, obj, "procedure"));
                     }
                     foreach (UserDefinedFunction obj in database.UserDefinedFunctions)
                     {
-                        string name = database.Name + "." + obj.Schema + "." + obj.Name;
-                        result.Add(new ObjectInfo(name, obj.Urn, "function"));
+                        // type detection is way too slow
+                        //string type = (obj.DataType == null) ? "table function" : "scalar function";
+                        result.Add(new ObjectInfo(database.Name, obj, "function"));
                     }
                     foreach (Table tbl in database.Tables)
                     {
-                        foreach (Trigger obj in tbl.Triggers)
+                        result.Add(new ObjectInfo(database.Name, tbl, "table"));
+                        foreach (Trigger trig in tbl.Triggers)
                         {
-                            string name = database.Name + "." + tbl.Schema + "." + tbl.Name + ":" + obj.Name;
-                            result.Add(new ObjectInfo(name, obj.Urn, "trigger"));
+                            string trname = database.Name + "." + tbl.Schema + "." + tbl.Name + ":" + trig.Name;
+                            result.Add(new ObjectInfo(trname, trig.Urn, "trigger"));
                         }
                     }
-                    
+                    foreach (View obj in database.Views)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "view"));
+                    }
+                    foreach (UserDefinedTableType obj in database.UserDefinedTableTypes)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "table type"));
+                    }
+                    foreach (UserDefinedDataType obj in database.UserDefinedDataTypes)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "data type"));
+                    }
                 }
             }
             return result;
@@ -110,12 +128,17 @@ namespace Opener
 
         public string GetObjectText(Urn urn)
         {
+            var obj = _server.GetSmoObject(urn);
+            if (obj is Table) // do not return create for tables, pretty much useless for edits
+            {
+                return null;
+            }
+
             StringCollection body = _scripter.Script(new Urn[] { urn });
             String[] bodyArray = new String[body.Count];
             body.CopyTo(bodyArray, 0);
 
             // replace create with alter
-            var obj = _server.GetSmoObject(urn);
             var textObj = obj as ITextObject;
             if (textObj != null)
             {

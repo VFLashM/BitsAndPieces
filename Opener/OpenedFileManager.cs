@@ -55,17 +55,20 @@ namespace Opener
             }
             else
             {
-                var script = ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql) as SqlScriptEditorControl;
-                script.EditorText = text;
-                _openedDocuments[key] = _applicationObject.ActiveDocument;
-
-                string fullPath = Properties.Settings.Default.ResolveProjectRoot();
-                if (!fullPath.EndsWith("\\")) 
+                if (text != null)
                 {
-                    fullPath += '\\';
+                    var script = ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql) as SqlScriptEditorControl;
+                    script.EditorText = text;
+                    _openedDocuments[key] = _applicationObject.ActiveDocument;
+
+                    string fullPath = Properties.Settings.Default.ResolveProjectRoot();
+                    if (!fullPath.EndsWith("\\"))
+                    {
+                        fullPath += '\\';
+                    }
+                    fullPath += key.Replace('.', '\\').Replace(':', '_') + ".sql";
+                    _applicationObject.ActiveDocument.Save(fullPath);
                 }
-                fullPath += key.Replace('.', '\\').Replace(':', '_') + ".sql";
-                _applicationObject.ActiveDocument.Save(fullPath);
             }
         }
     }

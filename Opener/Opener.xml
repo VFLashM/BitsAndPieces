@@ -4,6 +4,23 @@
         <name>Opener</name>
     </assembly>
     <members>
+        <member name="F:Opener.Configuration.components">
+            <summary> 
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Opener.Configuration.Dispose(System.Boolean)">
+            <summary> 
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Opener.Configuration.InitializeComponent">
+            <summary> 
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
         <member name="F:Opener.ChooseItem.components">
             <summary>
             Required designer variable.
@@ -72,23 +89,6 @@
             <param term='varOut'>Parameters passed from the command handler to the caller.</param>
             <param term='handled'>Informs the caller if the command was handled or not.</param>
             <seealso class='Exec' />
-        </member>
-        <member name="F:Opener.Configuration.components">
-            <summary> 
-            Required designer variable.
-            </summary>
-        </member>
-        <member name="M:Opener.Configuration.Dispose(System.Boolean)">
-            <summary> 
-            Clean up any resources being used.
-            </summary>
-            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        </member>
-        <member name="M:Opener.Configuration.InitializeComponent">
-            <summary> 
-            Required method for Designer support - do not modify 
-            the contents of this method with the code editor.
-            </summary>
         </member>
     </members>
 </doc>
