@@ -104,12 +104,15 @@ namespace Opener
             StringCollection body = _scripter.Script(new Urn[] { urn });
             String[] bodyArray = new String[body.Count];
             body.CopyTo(bodyArray, 0);
-            // hack to get alter instead of create
-            string createPrefix = "CREATE ";
-            if (bodyArray.Last().StartsWith(createPrefix))
+
+            // replace create with alter
+            var obj = _server.GetSmoObject(urn);
+            var textObj = obj as ITextObject;
+            if (textObj != null)
             {
-                bodyArray[bodyArray.Length-1] = "ALTER " + bodyArray.Last().Substring(createPrefix.Length);
+                bodyArray[body.Count - 1] = textObj.ScriptHeader(true) + textObj.TextBody;
             }
+
             return String.Join("\nGO\n", bodyArray);
         }
     }
