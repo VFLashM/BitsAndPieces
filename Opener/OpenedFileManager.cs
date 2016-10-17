@@ -6,6 +6,8 @@ using Microsoft.SqlServer.Management.UI.VSIntegration;
 using EnvDTE80;
 using Microsoft.SqlServer.Management.UI.VSIntegration.Editors;
 using EnvDTE;
+using Microsoft.SqlServer.Management.UI.VSIntegration.ObjectExplorer;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Opener
 {
@@ -46,29 +48,34 @@ namespace Opener
             }
         }
 
-        public void Open(string key, string text)
+        public void Open(string name, Urn urn, string text)
         {
+            string key = urn.ToString();
+            IObjectExplorerService objExplorer = ServiceCache.ServiceProvider.GetService(typeof(IObjectExplorerService)) as IObjectExplorerService;
+            var node = objExplorer.FindNode(key);
+            if (node != null)
+            {
+                objExplorer.SynchronizeTree(node);
+            }
+
             Document existingDocument;
             if (_openedDocuments.TryGetValue(key, out existingDocument))
             {
                 existingDocument.Activate();
             }
-            else
+            else if (text != null)
             {
-                if (text != null)
-                {
-                    var script = ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql) as SqlScriptEditorControl;
-                    script.EditorText = text;
-                    _openedDocuments[key] = _applicationObject.ActiveDocument;
+                var script = ServiceCache.ScriptFactory.CreateNewBlankScript(ScriptType.Sql) as SqlScriptEditorControl;
+                script.EditorText = text;
+                _openedDocuments[key] = _applicationObject.ActiveDocument;
 
-                    string fullPath = Properties.Settings.Default.ResolveProjectRoot();
-                    if (!fullPath.EndsWith("\\"))
-                    {
-                        fullPath += '\\';
-                    }
-                    fullPath += key.Replace('.', '\\').Replace(':', '_') + ".sql";
-                    _applicationObject.ActiveDocument.Save(fullPath);
+                string fullPath = Properties.Settings.Default.ResolveProjectRoot();
+                if (!fullPath.EndsWith("\\"))
+                {
+                    fullPath += '\\';
                 }
+                fullPath += name.Replace('.', '\\').Replace(':', '_') + ".sql";
+                _applicationObject.ActiveDocument.Save(fullPath);
             }
         }
     }
