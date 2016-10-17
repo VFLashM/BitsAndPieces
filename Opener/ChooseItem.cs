@@ -11,15 +11,29 @@ namespace Opener
 {
     public partial class ChooseItem : Form
     {
-        private string[] _values;
+        public class Item
+        {
+            public readonly string value;
+            public readonly string type;
+            public readonly string[] keywords;
+
+            public Item(string value, string type, string[] keywords)
+            {
+                this.value = value;
+                this.type = type;
+                this.keywords = keywords;
+            }
+        }
+
+        private Item[] _items;
         private bool _truncated = false;
 
-        public ChooseItem(string[] values, string title)
+        public ChooseItem(Item[] items, string title)
         {
             InitializeComponent();
             KeyPreview = true;
 
-            _values = values;
+            _items = items;
             UpdateList();
 
             list.DoubleClick += new EventHandler(list_DoubleClick);
@@ -37,11 +51,12 @@ namespace Opener
         {
             list.Items.Clear();
             _truncated = false;
-            foreach (var value in _values)
+            foreach (var item in _items)
             {
-                if (value.ToLower().Contains(text.Text.ToLower()))
+                if (item.value.ToLower().Contains(text.Text.ToLower()))
                 {
-                    list.Items.Add(new ListViewItem(new string[]{value, "type"}));
+                    
+                    list.Items.Add(new ListViewItem(new string[]{item.value, item.type}));
                     if (list.Items.Count > 100)
                     {
                         list.Items.Add(new ListViewItem("< too many items, list truncated >"));

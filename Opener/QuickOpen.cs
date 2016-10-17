@@ -14,13 +14,15 @@ namespace Opener
             var objects = accessor.GetObjects();
 
             var strToUrn = new Dictionary<string, Urn>();
+            var items = new List<ChooseItem.Item>();
             foreach (var obj in objects)
             {
                 strToUrn[obj.name] = obj.urn;
+                items.Add(new ChooseItem.Item(obj.name, obj.type, obj.name.Replace(':', '.').Split('.')));
             }
 
             string title = "Choose object on " + accessor.ServerName();
-            var choose = new ChooseItem(strToUrn.Keys.ToArray(), title);
+            var choose = new ChooseItem(items.ToArray(), title);
             if (choose.ShowDialog() != System.Windows.Forms.DialogResult.OK)
             {
                 return false;
