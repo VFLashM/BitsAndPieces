@@ -59,6 +59,22 @@ namespace Opener
             return _serverName;
         }
 
+        public ObjectInfo FindObject(string name)
+        {
+            foreach (var info in GetObjects())
+            {
+                string[] parts = info.name.Split('.');
+                if (name == info.name || // full match
+                    name == parts[0] + ".." + parts[2] || // database..name
+                    name == parts[1] + "." + parts[2] || // schema.name
+                    name == parts[2]) // raw name
+                {
+                    return info;
+                }
+            }
+            return null;
+        }
+
         public List<ObjectInfo> GetObjects()
         {
             var result = new List<ObjectInfo>();

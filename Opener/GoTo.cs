@@ -55,9 +55,23 @@ namespace Opener
             return text.Substring(from, to - from);
         }
 
-        static public bool Execute(DTE2 application)
+        static public bool Execute(DTE2 application, OpenedFileManager openedFileManager)
         {
-            MessageBox.Show(WordUnderCursor(application));
+            string name = WordUnderCursor(application);
+            if (name == null)
+            {
+                return false;
+            }
+
+            var accessor = new ObjectAccessor();
+            ObjectAccessor.ObjectInfo info = accessor.FindObject(name);
+            if (info == null)
+            {
+                return false;
+            }
+
+            string body = accessor.GetObjectText(info.urn);
+            openedFileManager.Open(info.name, body);
             return true;
         }
     }
