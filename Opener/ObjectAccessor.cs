@@ -94,6 +94,15 @@ namespace Opener
                         string name = database.Name + "." + obj.Schema + "." + obj.Name;
                         result.Add(new ObjectInfo(name, obj.Urn, "function"));
                     }
+                    foreach (Table tbl in database.Tables)
+                    {
+                        foreach (Trigger obj in tbl.Triggers)
+                        {
+                            string name = database.Name + "." + tbl.Schema + "." + tbl.Name + ":" + obj.Name;
+                            result.Add(new ObjectInfo(name, obj.Urn, "trigger"));
+                        }
+                    }
+                    
                 }
             }
             return result;

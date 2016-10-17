@@ -64,7 +64,7 @@ namespace Opener
                 {
                     fullPath += '\\';
                 }
-                fullPath += key.Replace('.', '\\') + ".sql";
+                fullPath += key.Replace('.', '\\').Replace(':', '_') + ".sql";
                 _applicationObject.ActiveDocument.Save(fullPath);
             }
         }
