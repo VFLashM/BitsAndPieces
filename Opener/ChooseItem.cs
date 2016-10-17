@@ -23,8 +23,14 @@ namespace Opener
             UpdateList();
 
             list.DoubleClick += new EventHandler(list_DoubleClick);
+            list.Resize += new EventHandler(list_Resize);
             text.TextChanged += new EventHandler(text_TextChanged);
             Text = title;
+        }
+
+        void list_Resize(object sender, EventArgs e)
+        {
+            list.Columns[0].Width = list.Width - list.Columns[1].Width - SystemInformation.VerticalScrollBarWidth - 4;
         }
 
         void UpdateList()
@@ -35,10 +41,10 @@ namespace Opener
             {
                 if (value.ToLower().Contains(text.Text.ToLower()))
                 {
-                    list.Items.Add(value);
+                    list.Items.Add(new ListViewItem(new string[]{value, "type"}));
                     if (list.Items.Count > 100)
                     {
-                        list.Items.Add("< too many items, list truncated >");
+                        list.Items.Add(new ListViewItem("< too many items, list truncated >"));
                         _truncated = true;
                         break;
                     }
@@ -46,8 +52,10 @@ namespace Opener
             }
             if (list.Items.Count > 0)
             {
-                list.SelectedIndex = 0;
+                list.Items[0].Selected = true;
             }
+            list.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
+            list_Resize(null, null);
         }
 
         void text_TextChanged(object sender, EventArgs e)
@@ -63,7 +71,7 @@ namespace Opener
         void Finish()
         {
             int itemCount = _truncated ? list.Items.Count - 1 : list.Items.Count;
-            if (list.SelectedIndex >= 0 && list.SelectedIndex < itemCount)
+            if (list.SelectedIndices.Count > 0 && list.SelectedIndices[0] < itemCount)
             {
                 DialogResult = DialogResult.OK;
             }
@@ -75,7 +83,11 @@ namespace Opener
 
         public string Result()
         {
-            return list.SelectedItem.ToString();
+            if (list.SelectedItems.Count > 0)
+            {
+                return list.SelectedItems[0].SubItems[0].Text;
+            }
+            return null;
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -91,16 +103,16 @@ namespace Opener
             }
             else if (e.KeyCode == Keys.Up)
             {
-                if (list.SelectedIndex > 0)
+                if (list.SelectedIndices.Count > 0 && list.SelectedIndices[0] > 0)
                 {
-                    list.SelectedIndex -= 1;
+                    list.Items[list.SelectedIndices[0]-1].Selected = true;
                 }
             }
             else if (e.KeyCode == Keys.Down)
             {
-                if (list.SelectedIndex < list.Items.Count - 1)
+                if (list.SelectedIndices.Count > 0 && list.SelectedIndices[0] < list.Items.Count - 1)
                 {
-                    list.SelectedIndex += 1;
+                    list.Items[list.SelectedIndices[0]+1].Selected = true;
                 }
             } 
             else 

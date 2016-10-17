@@ -28,23 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.list = new System.Windows.Forms.ListBox();
             this.text = new System.Windows.Forms.TextBox();
+            this.list = new System.Windows.Forms.ListView();
+            this.name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.type = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
-            // 
-            // list
-            // 
-            this.list.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.list.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.list.FormattingEnabled = true;
-            this.list.ItemHeight = 20;
-            this.list.Location = new System.Drawing.Point(12, 12);
-            this.list.Name = "list";
-            this.list.Size = new System.Drawing.Size(628, 364);
-            this.list.TabIndex = 1;
-            this.list.TabStop = false;
             // 
             // text
             // 
@@ -56,13 +44,37 @@
             this.text.Size = new System.Drawing.Size(628, 27);
             this.text.TabIndex = 0;
             // 
+            // list
+            // 
+            this.list.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.list.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.name,
+            this.type});
+            this.list.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.list.FullRowSelect = true;
+            this.list.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.list.HideSelection = false;
+            this.list.Location = new System.Drawing.Point(12, 12);
+            this.list.MultiSelect = false;
+            this.list.Name = "list";
+            this.list.Size = new System.Drawing.Size(628, 364);
+            this.list.TabIndex = 1;
+            this.list.UseCompatibleStateImageBehavior = false;
+            this.list.View = System.Windows.Forms.View.Details;
+            // 
+            // type
+            // 
+            this.type.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // ChooseItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(652, 430);
-            this.Controls.Add(this.text);
             this.Controls.Add(this.list);
+            this.Controls.Add(this.text);
             this.Name = "ChooseItem";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ChooseItem";
@@ -73,8 +85,10 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox list;
         private System.Windows.Forms.TextBox text;
+        private System.Windows.Forms.ListView list;
+        private System.Windows.Forms.ColumnHeader name;
+        private System.Windows.Forms.ColumnHeader type;
 
     }
 }
