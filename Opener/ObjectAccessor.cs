@@ -65,9 +65,9 @@ namespace Opener
             return _serverName;
         }
 
-        public ObjectInfo FindObject(string name)
+        static ObjectInfo MatchObject(List<ObjectInfo> objects, string name)
         {
-            foreach (var info in GetObjects())
+            foreach (var info in objects)
             {
                 string[] parts = info.name.Split('.');
                 if (name == info.name || // full match
@@ -79,6 +79,14 @@ namespace Opener
                 }
             }
             return null;
+        }
+
+        public ObjectInfo FindObject(string name, string databaseHint)
+        {
+            var objects = GetObjects();
+            return MatchObject(objects, databaseHint + "." + name) 
+                ?? MatchObject(objects, databaseHint + ".." + name)
+                ?? MatchObject(objects, name);
         }
 
         public List<ObjectInfo> GetObjects()
