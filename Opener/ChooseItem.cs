@@ -255,14 +255,20 @@ namespace Opener
                 case Keys.PageDown:
                     SelectIdx(CurrentIdx() + 10);
                     break;
-                    /* home and end are more useful in editing line
                 case Keys.Home:
-                    SelectIdx(0);
-                    break;
+                    if (e.Control)
+                    {
+                        SelectIdx(0);
+                        break;
+                    }
+                    goto default;
                 case Keys.End:
-                    SelectIdx(list.Items.Count);
-                    break;
-                     * */
+                    if (e.Control)
+                    {
+                        SelectIdx(list.Items.Count);
+                        break;
+                    }
+                    goto default;
                 default:
                     e.Handled = false;
                     text.Focus();
