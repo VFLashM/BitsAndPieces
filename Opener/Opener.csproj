@@ -22,6 +22,7 @@
     <WarningLevel>4</WarningLevel>
     <IncrementalBuild>false</IncrementalBuild>
     <DocumentationFile>Opener.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -58,7 +59,7 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Windows\assembly\GAC\Microsoft.VisualStudio.OLE.Interop\7.1.40304.0__b03f5f7f11d50a3a\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 2010 SDK\VisualStudioIntegration\Common\Assemblies\v2.0\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -66,11 +67,11 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Windows\assembly\GAC\Microsoft.VisualStudio.Shell.Interop\7.1.40304.0__b03f5f7f11d50a3a\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 2010 SDK\VisualStudioIntegration\Common\Assemblies\v2.0\Microsoft.VisualStudio.Shell.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Windows\assembly\GAC\Microsoft.VisualStudio.TextManager.Interop\7.1.40304.0__b03f5f7f11d50a3a\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 2010 SDK\VisualStudioIntegration\Common\Assemblies\v2.0\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
     </Reference>
     <Reference Include="SQLEditors">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\ManagementStudio\Extensions\Application\SQLEditors.dll</HintPath>
