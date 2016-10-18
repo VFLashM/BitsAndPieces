@@ -20,18 +20,21 @@ namespace Opener
         public class ObjectInfo
         {
             readonly public string name;
+            readonly public string schema;
             readonly public Urn urn;
             readonly public string type;
 
-            public ObjectInfo(string name, Urn urn, string type)
+            public ObjectInfo(string database, string schema, string name, Urn urn, string type)
             {
-                this.name = name;
+                this.name = database + ((schema != null) ? ("." + schema + ".") : ".") + name;
+                this.schema = schema;
                 this.urn = urn;
                 this.type = type;
             }
             public ObjectInfo(string database, ScriptSchemaObjectBase obj, string type)
             {
                 this.name = database + "." + obj.Schema + "." + obj.Name;
+                this.schema = obj.Schema;
                 this.urn = obj.Urn;
                 this.type = type;
             }
@@ -97,6 +100,7 @@ namespace Opener
         {
             var result = new List<ObjectInfo>();
             string[] databases = Properties.Settings.Default.GetDatabases();
+            string[] schemas = Properties.Settings.Default.GetSchemas();
 
             foreach (Database database in _server.Databases)
             {
@@ -117,8 +121,7 @@ namespace Opener
                         result.Add(new ObjectInfo(database.Name, tbl, "table"));
                         foreach (Trigger trig in tbl.Triggers)
                         {
-                            string trname = database.Name + "." + tbl.Schema + "." + tbl.Name + ":" + trig.Name;
-                            result.Add(new ObjectInfo(trname, trig.Urn, "trigger"));
+                            result.Add(new ObjectInfo(database.Name, tbl.Schema, tbl.Name + ":" + trig.Name, trig.Urn, "trigger"));
                         }
                     }
                     foreach (View obj in database.Views)
@@ -147,8 +150,7 @@ namespace Opener
                     }
                     foreach (DatabaseDdlTrigger obj in database.Triggers)
                     {
-                        var name = database.Name + '.' + obj.Name;
-                        result.Add(new ObjectInfo(name, obj.Urn, "ddl trigger"));
+                        result.Add(new ObjectInfo(database.Name, null, obj.Name, obj.Urn, "ddl trigger"));
                     }
                     /* these are not very useful it seems
                     foreach (Rule obj in database.Rules)
@@ -172,6 +174,7 @@ namespace Opener
                      */
                 }
             }
+            result.RemoveAll(item => item.schema != null && !schemas.Contains(item.schema));
             return result;
         }
 

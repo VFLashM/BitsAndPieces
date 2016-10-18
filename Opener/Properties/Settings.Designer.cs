@@ -46,5 +46,17 @@ namespace Opener.Properties {
                 this["Databases"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Schemas {
+            get {
+                return ((string)(this["Schemas"]));
+            }
+            set {
+                this["Schemas"] = value;
+            }
+        }
     }
 }

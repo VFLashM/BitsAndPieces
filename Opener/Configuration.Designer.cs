@@ -32,6 +32,8 @@
             this.databasesTextBox = new System.Windows.Forms.TextBox();
             this.rootLabel = new System.Windows.Forms.Label();
             this.databasesLabel = new System.Windows.Forms.Label();
+            this.schemasLabel = new System.Windows.Forms.Label();
+            this.schemasTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // rootTextBox
@@ -74,10 +76,32 @@
             this.databasesLabel.TabIndex = 3;
             this.databasesLabel.Text = "Comma separated database list:";
             // 
+            // schemasLabel
+            // 
+            this.schemasLabel.AutoSize = true;
+            this.schemasLabel.Location = new System.Drawing.Point(3, 62);
+            this.schemasLabel.Name = "schemasLabel";
+            this.schemasLabel.Size = new System.Drawing.Size(201, 17);
+            this.schemasLabel.TabIndex = 4;
+            this.schemasLabel.Text = "Comma separated schema list:";
+            // 
+            // schemasTextBox
+            // 
+            this.schemasTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.schemasTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Opener.Properties.Settings.Default, "Schemas", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.schemasTextBox.Location = new System.Drawing.Point(220, 59);
+            this.schemasTextBox.Name = "schemasTextBox";
+            this.schemasTextBox.Size = new System.Drawing.Size(262, 22);
+            this.schemasTextBox.TabIndex = 5;
+            this.schemasTextBox.Text = global::Opener.Properties.Settings.Default.Schemas;
+            // 
             // Configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.schemasTextBox);
+            this.Controls.Add(this.schemasLabel);
             this.Controls.Add(this.databasesLabel);
             this.Controls.Add(this.rootLabel);
             this.Controls.Add(this.databasesTextBox);
@@ -95,5 +119,7 @@
         private System.Windows.Forms.TextBox databasesTextBox;
         private System.Windows.Forms.Label rootLabel;
         private System.Windows.Forms.Label databasesLabel;
+        private System.Windows.Forms.Label schemasLabel;
+        private System.Windows.Forms.TextBox schemasTextBox;
     }
 }

@@ -18,6 +18,7 @@ namespace Opener.Properties {
             {
                 Default.ResolveProjectRoot();
                 Default.GetDatabases();
+                Default.GetSchemas();
                 Default.Save();
             }
             catch (Error e)
@@ -36,16 +37,26 @@ namespace Opener.Properties {
             return rootPath;
         }
 
-        public string[] GetDatabases()
+        static string[] ParseCommaSeparated(string text, string helpName)
         {
             char[] separators = { ',' };
-            var parts = Databases.Split(separators).ToList();
+            var parts = text.Split(separators).ToList();
             var result = parts.Select(db => db.Trim()).Where(s => !String.IsNullOrWhiteSpace(s)).ToList();
             if (result.Count == 0)
             {
-                throw new Error("No databases specified\nList databases in Tools->Options->Bits and Pieces->Opener", "Configuration error");
+                throw new Error("No " + helpName + " specified\nList " + helpName + " in Tools->Options->Bits and Pieces->Opener", "Configuration error");
             }
             return result.ToArray();
+        }
+
+        public string[] GetDatabases()
+        {
+            return ParseCommaSeparated(Databases, "databases");
+        }
+
+        public string[] GetSchemas()
+        {
+            return ParseCommaSeparated(Schemas, "schemas");
         }
 
         protected override void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
