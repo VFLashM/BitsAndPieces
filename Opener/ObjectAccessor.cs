@@ -123,6 +123,7 @@ namespace Opener
                         {
                             result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + trig.Name, trig.Urn, "trigger"));
                         }
+                        /* somewhat useful, but slow everyhing down too much
                         foreach (Index ind in obj.Indexes)
                         {
                             result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + ind.Name, ind.Urn, "index"));
@@ -131,10 +132,12 @@ namespace Opener
                         {
                             result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + chk.Name, chk.Urn, "constraint"));
                         }
+                         */
                     }
                     foreach (View obj in database.Views)
                     {
                         result.Add(new ObjectInfo(database.Name, obj, "view"));
+                        /* somewhat useful, but slow everyhing down too much
                         foreach (Trigger trig in obj.Triggers)
                         {
                             result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + trig.Name, trig.Urn, "view trigger"));
@@ -143,6 +146,7 @@ namespace Opener
                         {
                             result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + ind.Name, ind.Urn, "view index"));
                         }
+                         */
                     }
                     foreach (UserDefinedTableType obj in database.UserDefinedTableTypes)
                     {
