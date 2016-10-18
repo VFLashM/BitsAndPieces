@@ -70,10 +70,14 @@ namespace Opener
             foreach (var info in objects)
             {
                 string[] parts = info.name.Split('.');
-                if (name == info.name || // full match
-                    name == parts[0] + ".." + parts[2] || // database..name
-                    name == parts[1] + "." + parts[2] || // schema.name
-                    name == parts[2]) // raw name
+                string database = parts[0];
+                string objname = parts[parts.Length - 1];
+                string schema = parts.Length > 2 ? parts[1] : "";
+
+                if (name == info.name ||
+                    name == database + ".." + objname ||
+                    name == schema + "." + objname ||
+                    name == objname)
                 {
                     return info;
                 }
