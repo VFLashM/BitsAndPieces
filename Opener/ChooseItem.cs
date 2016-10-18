@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace Opener
 {
@@ -22,31 +23,42 @@ namespace Opener
                 this.priority = priority;
             }
 
-            public int? Match(string template)
+            static int? Match(string value, string template)
             {
                 if (value == template)
                 {
-                    return this.priority * 6 + 5;
-                }
-                if (value.ToLower() == template.ToLower())
-                {
-                    return this.priority * 6 + 4;
+                    return 4;
                 }
                 if (value.StartsWith(template))
                 {
-                    return this.priority * 6 + 3;
-                }
-                if (value.ToLower().StartsWith(template.ToLower()))
-                {
-                    return this.priority * 6 + 2;
+                    return 3;
                 }
                 if (value.Contains(template))
                 {
-                    return this.priority * 6 + 1;
+                    return 2;
                 }
-                if (value.ToLower().Contains(template.ToLower()))
+                if (template.Contains(' '))
                 {
-                    return this.priority * 6;
+                    var regexTemplate = Regex.Escape(template).Replace("\\ ", ".*");
+                    if (Regex.IsMatch(value, regexTemplate))
+                    {
+                        return 1;
+                    }
+                }
+                return null;
+            }
+
+            public int? Match(string template)
+            {
+                int? match = Match(value, template);
+                if (match.HasValue)
+                {
+                    return priority * 100 + match.Value * 2 + 1;
+                }
+                match = Match(value.ToLower(), template.ToLower());
+                if (match.HasValue)
+                {
+                    return priority * 100 + match.Value * 2;
                 }
                 return null;
             }
