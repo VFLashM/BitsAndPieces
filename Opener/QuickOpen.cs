@@ -18,7 +18,7 @@ namespace Opener
             foreach (var obj in objects)
             {
                 strToUrn[obj.name] = obj.urn;
-                items.Add(new ChooseItem.Item(obj.name, obj.type, obj.name.Replace(':', '.').Split('.')));
+                items.Add(new ChooseItem.Item(obj.name, obj.type));
             }
 
             string title = "Choose object on " + accessor.ServerName();

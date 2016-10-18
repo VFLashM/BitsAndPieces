@@ -11,17 +11,121 @@ namespace Opener
 {
     public partial class ChooseItem : Form
     {
+        class SearchTerm : IComparable
+        {
+            public readonly string value;
+            public readonly int priority;
+
+            public SearchTerm(string value, int priority)
+            {
+                this.value = value;
+                this.priority = priority;
+            }
+
+            public int? Match(string template)
+            {
+                if (value == template)
+                {
+                    return this.priority * 6 + 5;
+                }
+                if (value.ToLower() == template.ToLower())
+                {
+                    return this.priority * 6 + 4;
+                }
+                if (value.StartsWith(template))
+                {
+                    return this.priority * 6 + 3;
+                }
+                if (value.ToLower().StartsWith(template.ToLower()))
+                {
+                    return this.priority * 6 + 2;
+                }
+                if (value.Contains(template))
+                {
+                    return this.priority * 6 + 1;
+                }
+                if (value.ToLower().Contains(template.ToLower()))
+                {
+                    return this.priority * 6;
+                }
+                return null;
+            }
+
+            public int CompareTo(object obj)
+            {
+                return -this.priority.CompareTo((obj as SearchTerm).priority);
+            }
+        }
+
         public class Item
         {
             public readonly string value;
             public readonly string type;
-            public readonly string[] keywords;
+            readonly SearchTerm[] searchTerms;
 
-            public Item(string value, string type, string[] keywords)
+            public Item(string value, string type)
             {
+                var searchTerms = new List<SearchTerm>();
+                searchTerms.Add(new SearchTerm(type, 0));
+                searchTerms.Add(new SearchTerm(value, 1));
+                int priority = 2;
+                foreach (var part in value.Split('.'))
+                {
+                    foreach (var term in part.Split(':'))
+                    {
+                        searchTerms.Add(new SearchTerm(term, priority));
+                    }
+                    ++priority;
+                }
+                searchTerms.Sort();
+
                 this.value = value;
-                this.type = type;
-                this.keywords = keywords;
+                this.type = type; 
+                this.searchTerms = searchTerms.ToArray();
+            }
+
+            public float? Match(string template)
+            {
+                foreach (var term in searchTerms)
+                {
+                    int? match = term.Match(template);
+                    if (match.HasValue)
+                    {
+                        int totalTermLength = 0;
+                        int totalMatchedLength = 0;
+                        foreach (var otherTerm in searchTerms)
+                        {
+                            if (otherTerm.priority == term.priority)
+                            {
+                                totalTermLength += otherTerm.value.Length;
+                                if (otherTerm.Match(template).HasValue)
+                                {
+                                    totalMatchedLength += template.Length;
+                                }
+                            }
+                        }
+                        float matchRate = (float)totalMatchedLength / (totalTermLength + 1);
+                        return match.Value + matchRate;
+                    }
+                }
+                return null;
+            }
+        }
+
+        class FilteredItem : IComparable
+        {
+            public readonly string[] data;
+            public readonly float priority;
+
+            public FilteredItem(string[] data, float priority)
+            {
+                this.data = data;
+                this.priority = priority;
+            }
+
+            public int CompareTo(object obj)
+            {
+                return -this.priority.CompareTo((obj as FilteredItem).priority);
             }
         }
 
@@ -49,20 +153,26 @@ namespace Opener
 
         void UpdateList()
         {
+            var filteredItems = new List<FilteredItem>();
             list.Items.Clear();
             _truncated = false;
             foreach (var item in _items)
             {
-                if (item.value.ToLower().Contains(text.Text.ToLower()))
+                float? priority = item.Match(text.Text);
+                if (priority.HasValue)
                 {
-                    
-                    list.Items.Add(new ListViewItem(new string[]{item.value, item.type}));
-                    if (list.Items.Count > 100)
-                    {
-                        list.Items.Add(new ListViewItem("< too many items, list truncated >"));
-                        _truncated = true;
-                        break;
-                    }
+                    filteredItems.Add(new FilteredItem(new string[] { item.value, item.type }, priority.Value));
+                }
+            }
+            filteredItems.Sort();
+            foreach (var filteredItem in filteredItems)
+            {
+                list.Items.Add(new ListViewItem(filteredItem.data));
+                if (list.Items.Count > 100)
+                {
+                    list.Items.Add(new ListViewItem("< too many items, list truncated >"));
+                    _truncated = true;
+                    break;
                 }
             }
             if (list.Items.Count > 0)
