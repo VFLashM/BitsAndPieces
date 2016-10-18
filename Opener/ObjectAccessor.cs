@@ -129,6 +129,43 @@ namespace Opener
                     {
                         result.Add(new ObjectInfo(database.Name, obj, "data type"));
                     }
+                    foreach (UserDefinedType obj in database.UserDefinedTypes)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "clr type"));
+                    }
+                    foreach (ExtendedStoredProcedure obj in database.ExtendedStoredProcedures)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "extended procedure"));
+                    }
+                    foreach (UserDefinedAggregate obj in database.UserDefinedAggregates)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "aggregate"));
+                    }
+                    foreach (DatabaseDdlTrigger obj in database.Triggers)
+                    {
+                        var name = database.Name + '.' + obj.Name;
+                        result.Add(new ObjectInfo(name, obj.Urn, "ddl trigger"));
+                    }
+                    /* these are not very useful it seems
+                    foreach (Rule obj in database.Rules)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "rule"));
+                    }
+                    foreach (SqlAssembly obj in database.Assemblies)
+                    {
+                        var name = database.Name + '.' + obj.Name;
+                        result.Add(new ObjectInfo(name, obj.Urn, "assembly"));
+                    }
+                    foreach (Default obj in database.Defaults)
+                    {
+                        result.Add(new ObjectInfo(database.Name, obj, "default"));
+                    }
+                    foreach (PlanGuide obj in database.PlanGuides)
+                    {
+                        var name = database.Name + '.' + obj.Name;
+                        result.Add(new ObjectInfo(name, obj.Urn, "plan guide"));
+                    }
+                     */
                 }
             }
             return result;
@@ -137,7 +174,8 @@ namespace Opener
         public string GetObjectText(Urn urn)
         {
             var obj = _server.GetSmoObject(urn);
-            if (obj is Table) // do not return create for tables, pretty much useless for edits
+            var textObj = obj as ITextObject;
+            if (textObj == null) // do not return create for tables and other non-alterable objects
             {
                 return null;
             }
@@ -147,11 +185,7 @@ namespace Opener
             body.CopyTo(bodyArray, 0);
 
             // replace create with alter
-            var textObj = obj as ITextObject;
-            if (textObj != null)
-            {
-                bodyArray[body.Count - 1] = textObj.ScriptHeader(true) + textObj.TextBody;
-            }
+            bodyArray[body.Count - 1] = textObj.ScriptHeader(true) + textObj.TextBody;
 
             return String.Join("\nGO\n", bodyArray);
         }
