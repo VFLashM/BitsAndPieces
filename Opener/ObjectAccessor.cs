@@ -104,7 +104,7 @@ namespace Opener
 
             foreach (Database database in _server.Databases)
             {
-                if (databases.Contains(database.Name))
+                if (databases.Contains(database.Name) && database.IsAccessible)
                 {
                     foreach (StoredProcedure obj in database.StoredProcedures)
                     {
