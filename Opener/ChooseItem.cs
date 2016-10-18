@@ -215,35 +215,56 @@ namespace Opener
             return null;
         }
 
+        int CurrentIdx()
+        {
+            return list.SelectedIndices.Count > 0 ? list.SelectedIndices[0] : -1;
+        }
+
+        void SelectIdx(int idx)
+        {
+            if (list.Items.Count == 0)
+            {
+                return;
+            }
+            idx = Math.Max(idx, 0);
+            idx = Math.Min(idx, list.Items.Count - 1);
+            list.Items[idx].Selected = true;
+            list.EnsureVisible(idx);
+        }
+
         protected override void OnKeyDown(KeyEventArgs e)
         {
             e.Handled = true;
-            if (e.KeyCode == Keys.Enter)
+            switch (e.KeyCode)
             {
-                Finish();
-            }
-            else if (e.KeyCode == Keys.Escape)
-            {
-                DialogResult = DialogResult.Cancel;
-            }
-            else if (e.KeyCode == Keys.Up)
-            {
-                if (list.SelectedIndices.Count > 0 && list.SelectedIndices[0] > 0)
-                {
-                    list.Items[list.SelectedIndices[0]-1].Selected = true;
-                }
-            }
-            else if (e.KeyCode == Keys.Down)
-            {
-                if (list.SelectedIndices.Count > 0 && list.SelectedIndices[0] < list.Items.Count - 1)
-                {
-                    list.Items[list.SelectedIndices[0]+1].Selected = true;
-                }
-            } 
-            else 
-            {
-                e.Handled = false;
-                text.Focus();
+                case Keys.Enter:
+                    Finish();
+                    break;
+                case Keys.Escape:
+                    DialogResult = DialogResult.Cancel;
+                    break;
+                case Keys.Up:
+                    SelectIdx(CurrentIdx() - 1);
+                    break;
+                case Keys.Down:
+                    SelectIdx(CurrentIdx() + 1);
+                    break;
+                case Keys.PageUp:
+                    SelectIdx(CurrentIdx() - 10);
+                    break;
+                case Keys.PageDown:
+                    SelectIdx(CurrentIdx() + 10);
+                    break;
+                case Keys.Home:
+                    SelectIdx(0);
+                    break;
+                case Keys.End:
+                    SelectIdx(list.Items.Count);
+                    break;
+                default:
+                    e.Handled = false;
+                    text.Focus();
+                    break;
             }
             base.OnKeyDown(e);
         }
