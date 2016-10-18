@@ -104,7 +104,7 @@ namespace Opener
                                 }
                             }
                         }
-                        float matchRate = (float)totalMatchedLength / (totalTermLength + 1);
+                        float matchRate = (float)(Math.Max(totalMatchedLength, 1)) / (totalTermLength + 1);
                         return match.Value + matchRate;
                     }
                 }
@@ -255,12 +255,14 @@ namespace Opener
                 case Keys.PageDown:
                     SelectIdx(CurrentIdx() + 10);
                     break;
+                    /* home and end are more useful in editing line
                 case Keys.Home:
                     SelectIdx(0);
                     break;
                 case Keys.End:
                     SelectIdx(list.Items.Count);
                     break;
+                     * */
                 default:
                     e.Handled = false;
                     text.Focus();
