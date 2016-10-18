@@ -116,17 +116,33 @@ namespace Opener
                         //string type = (obj.DataType == null) ? "table function" : "scalar function";
                         result.Add(new ObjectInfo(database.Name, obj, "function"));
                     }
-                    foreach (Table tbl in database.Tables)
+                    foreach (Table obj in database.Tables)
                     {
-                        result.Add(new ObjectInfo(database.Name, tbl, "table"));
-                        foreach (Trigger trig in tbl.Triggers)
+                        result.Add(new ObjectInfo(database.Name, obj, "table"));
+                        foreach (Trigger trig in obj.Triggers)
                         {
-                            result.Add(new ObjectInfo(database.Name, tbl.Schema, tbl.Name + ":" + trig.Name, trig.Urn, "trigger"));
+                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + trig.Name, trig.Urn, "trigger"));
+                        }
+                        foreach (Index ind in obj.Indexes)
+                        {
+                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + ind.Name, ind.Urn, "index"));
+                        }
+                        foreach (Check chk in obj.Checks)
+                        {
+                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + chk.Name, chk.Urn, "constraint"));
                         }
                     }
                     foreach (View obj in database.Views)
                     {
                         result.Add(new ObjectInfo(database.Name, obj, "view"));
+                        foreach (Trigger trig in obj.Triggers)
+                        {
+                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + trig.Name, trig.Urn, "view trigger"));
+                        }
+                        foreach (Index ind in obj.Indexes)
+                        {
+                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + ind.Name, ind.Urn, "view index"));
+                        }
                     }
                     foreach (UserDefinedTableType obj in database.UserDefinedTableTypes)
                     {
