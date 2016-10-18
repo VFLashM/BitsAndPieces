@@ -182,7 +182,8 @@ namespace Opener
                 list.Items.Add(new ListViewItem(filteredItem.data));
                 if (list.Items.Count > 100)
                 {
-                    list.Items.Add(new ListViewItem("< too many items, list truncated >"));
+                    var remaining = filteredItems.Count - list.Items.Count;
+                    list.Items.Add(new ListViewItem("< too many items, " + remaining + " items truncated >"));
                     _truncated = true;
                     break;
                 }
