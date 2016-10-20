@@ -15,6 +15,5 @@ namespace Joiner
             this.id = id;
             this.alias = alias;
         }
-        
     }
 }

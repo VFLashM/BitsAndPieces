@@ -18,13 +18,17 @@ namespace Joiner
         static readonly Regex aliasRegex = new Regex(@"^\s+(?<as>as\s+)?(?<alias>[a-zA-Z_][a-zA-Z_0-9]*)", RegexOptions.IgnoreCase);
         static readonly Regex onRegex = new Regex(@"\bon\b\s*", RegexOptions.IgnoreCase);
         static readonly Regex whitespaceRegex = new Regex(@"^\s*$");
+        static readonly Regex tableDefRegex = new Regex(
+            @"declare\s+(?<name>@[a-zA-Z_][a-zA-Z_0-9]*)\s+table\s*" + "|" + // table var
+            @"create\s+table\s+(?<name>#+[a-zA-Z_][a-zA-Z_0-9]*)\s*"         // temp table
+            , RegexOptions.IgnoreCase);
 
         static bool ConsumeRegex(ref string str, Regex regex, out Match match)
         {
             match = regex.Match(str);
             if (match.Success)
             {
-                str = str.Substring(match.Index + match.Groups[0].Length);
+                str = str.Substring(match.Index + match.Length);
             }
             return match.Success;
         }
@@ -86,7 +90,7 @@ namespace Joiner
             return true;
         }
 
-        static public ContextInfo Parse(string body)
+        static public ContextInfo ParseContext(string body)
         {
             Match match;
             if (!ConsumeRegex(ref body, fromRegex, out match))
@@ -137,6 +141,27 @@ namespace Joiner
             while (ConsumeRegex(ref body, joinRegex, out match));
 
             return new ContextInfo(tables, null, false);
+        }
+
+        static List<ColumnDef> ParseTableColumns(string body)
+        {
+            return null;
+        }
+
+        static public Dictionary<string, List<ColumnDef>> ParseTables(string body)
+        {
+            var res = new Dictionary<string, List<ColumnDef>>();
+            foreach (Match match in tableDefRegex.Matches(body))
+            {
+                var name = match.Groups["name"].Value;
+                var def = body.Substring(match.Index + match.Length);
+                var columns = ParseTableColumns(def);
+                if (columns != null)
+                {
+                    res[name] = columns;
+                }
+            }
+            return res;
         }
     }
 }
