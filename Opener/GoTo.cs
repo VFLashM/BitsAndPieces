@@ -64,7 +64,7 @@ namespace Opener
             var match = databaseRegex.Match(prefix);
             if (match.Success)
             {
-                database = match.Groups["db"].ToString();
+                database = match.Groups["db"].Value;
             }
 
             var accessor = new ObjectAccessor();
