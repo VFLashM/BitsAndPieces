@@ -61,7 +61,9 @@
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ContextInfo.cs" />
     <Compile Include="Joiner.cs" />
+    <Compile Include="TableInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE">
