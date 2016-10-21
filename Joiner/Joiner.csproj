@@ -122,6 +122,7 @@
     <Compile Include="Joiner.cs" />
     <Compile Include="JoinParser.cs" />
     <Compile Include="Rule.cs" />
+    <Compile Include="RuleGenerator.cs" />
     <Compile Include="TableAccessor.cs" />
     <Compile Include="TableInfo.cs" />
   </ItemGroup>

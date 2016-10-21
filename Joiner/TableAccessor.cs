@@ -166,7 +166,9 @@ join sys.columns refcol
                 id.Add("");
             }
             id.Add(table.Name);
-            return new TableInfo(id, table.Urn, AliasFromName(table.Name));
+            var res = new TableInfo(id, AliasFromName(table.Name));
+            res.Bind(table);
+            return res;
         }
 
         public bool ResolveTable(TableInfo t)
@@ -184,7 +186,7 @@ join sys.columns refcol
             Table tab = FindTable(db, schema, id.Last());
             if (tab != null)
             {
-                t.SetUrn(tab.Urn);
+                t.Bind(tab);
             }
             return tab != null;
         }

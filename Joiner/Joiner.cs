@@ -150,6 +150,41 @@ namespace Joiner
             {
                 rules.AddRange(tableAccessor.GetForeignKeyRules(contextDatabase));
             }
+            foreach (var tab in context.AllTables())
+            {
+                var generated = RuleGenerator.CreateSelf(tab);
+                if (generated != null)
+                {
+                    rules.Add(generated);
+                }
+            }
+            foreach (var t1 in context.AllTables())
+            {
+                foreach (var t2 in context.AllTables())
+                {
+                    if (t1 != t2)
+                    {
+                        bool hasRule = false;
+                        foreach (var rule in rules)
+                        {
+                            if (rule.Match(t1, t2))
+                            {
+                                hasRule = true;
+                                break;
+                            }
+                        }
+                        if (hasRule)
+                        {
+                            continue;
+                        }
+                        var generated = RuleGenerator.Create(t1, t2);
+                        if (generated != null)
+                        {
+                            rules.Add(generated);
+                        }
+                    }
+                }
+            }
 
             var options = new List<Tuple<string, string>>();
             if (context.newTable != null)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
+using Microsoft.SqlServer.Management.Smo;
 
 namespace Joiner
 {
@@ -11,16 +12,10 @@ namespace Joiner
         private List<string> id;
         private Urn urn = null;
         private string alias;
+        private List<string> columns = null;
 
         public TableInfo(List<string> id, string alias)
         {
-            this.id = id;
-            this.alias = alias;
-        }
-
-        public TableInfo(List<string> id, Urn urn, string alias)
-        {
-            this.urn = urn;
             this.id = id;
             this.alias = alias;
         }
@@ -35,9 +30,19 @@ namespace Joiner
             return id.Count >= 3 ? id[0] : null;
         }
 
-        public void SetUrn(Urn urn)
+        public List<string> Columns()
         {
-            this.urn = urn;
+            return columns;
+        }
+
+        public void Bind(Table table)
+        {
+            this.urn = table.Urn;
+            this.columns = new List<string>();
+            foreach (Column col in table.Columns)
+            {
+                this.columns.Add(col.Name);
+            }
         }
 
         public string Alias()
