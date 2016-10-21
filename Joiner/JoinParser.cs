@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Joiner
 {
-    class Parser
+    class JoinParser
     {
         static readonly Regex fromRegex = new Regex(@"\bfrom\b\s*", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
         static readonly Regex joinRegex = new Regex(@"\bjoin\b\s*", RegexOptions.IgnoreCase);

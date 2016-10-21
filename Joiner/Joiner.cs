@@ -30,7 +30,7 @@ namespace Joiner
 
             string body = text.Substring(0, cursorPos);
 
-            ContextInfo context = Parser.ParseContext(body);
+            ContextInfo context = JoinParser.ParseContext(body);
             return context != null;
         }
     }

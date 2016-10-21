@@ -64,7 +64,7 @@
     </Compile>
     <Compile Include="ContextInfo.cs" />
     <Compile Include="Joiner.cs" />
-    <Compile Include="Parser.cs" />
+    <Compile Include="JoinParser.cs" />
     <Compile Include="TableInfo.cs" />
   </ItemGroup>
   <ItemGroup>
