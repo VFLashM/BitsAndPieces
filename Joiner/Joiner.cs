@@ -64,11 +64,42 @@ namespace Joiner
             var caretPos = wpfTextView.Caret.Position.BufferPosition;
             var bounds = wpfTextView.GetTextViewLineContainingBufferPosition(caretPos).GetCharacterBounds(caretPos);
             var offset = uiElement.PointToScreen(new System.Windows.Point(0, 0));
+
+            double zoomMultiplier = wpfTextView.ZoomLevel / 100.0;
             return new CaretLocation(
-                Convert.ToInt32(offset.X + bounds.Left),
-                Convert.ToInt32(offset.Y + bounds.Top),
-                Convert.ToInt32(offset.Y + bounds.Bottom)
+                Convert.ToInt32(offset.X + (bounds.Right - wpfTextView.ViewportLeft) * zoomMultiplier),
+                Convert.ToInt32(offset.Y + (bounds.Top - wpfTextView.ViewportTop) * zoomMultiplier),
+                Convert.ToInt32(offset.Y + (bounds.Bottom - wpfTextView.ViewportTop) * zoomMultiplier)
             );
+        }
+
+        static void PlaceFormAtCaret(DTE2 application, Form form)
+        {
+            var location = GetCaretLocation(application);
+            if (location == null)
+            {
+                return;
+            }
+            int center = (location.top + location.bottom) / 2;
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                if (screen.WorkingArea.Contains(new Point(location.left, center)))
+                {
+                    form.StartPosition = FormStartPosition.Manual;
+                    int x = Math.Min(location.left, screen.WorkingArea.Right - form.Width);
+                    x = Math.Max(screen.WorkingArea.Left, x);
+
+                    int offset = 5;
+                    int y = location.bottom + offset;
+                    if ((y + form.Height) > screen.WorkingArea.Bottom)
+                    {
+                        y = location.top - offset - form.Height;
+                    }
+                    y = Math.Max(screen.WorkingArea.Top, y);
+
+                    form.Location = new Point(x, y);
+                }
+            }
         }
 
         static public bool Execute(DTE2 application)
@@ -160,13 +191,7 @@ namespace Joiner
             }
 
             Common.ChooseItem dialog = new Common.ChooseItem(items.ToArray(), null);
-            var location = GetCaretLocation(application);
-            if (location != null)
-            {
-                dialog.StartPosition = FormStartPosition.Manual;
-                dialog.Location = new Point(Convert.ToInt32(location.left), Convert.ToInt32(location.bottom));
-                
-            }
+            PlaceFormAtCaret(application, dialog);
             dialog.ShowDialog();
 
             return context != null;

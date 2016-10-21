@@ -143,16 +143,6 @@ namespace Common
 
         public ChooseItem(Item[] items, string title)
         {
-            if (title != null)
-            {
-                Text = title;
-            }
-            else
-            {
-                this.ControlBox = false;
-                this.Text = String.Empty;
-            }
-
             InitializeComponent();
             KeyPreview = true;
 
@@ -163,8 +153,15 @@ namespace Common
             list.Resize += new EventHandler(list_Resize);
             text.TextChanged += new EventHandler(text_TextChanged);
             
-            if (title == null)
+            if (title != null)
             {
+                Text = title;
+            }
+            else
+            {
+                this.ControlBox = false;
+                this.Text = String.Empty;
+
                 list.Width = this.Width;
                 list.Top = 0;
                 list.Left = 0;
