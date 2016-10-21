@@ -11,10 +11,10 @@ namespace Common
 {
     public class Connection
     {
-        public static string GetActiveDatabase(string text)
+        public static string GetActiveDatabase(string text, int? atPos = null)
         {
             string currentDatabase = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo.AdvancedOptions["DATABASE"];
-            return Parser.ParseUseDatabase(text) ?? currentDatabase;
+            return Parser.ParseUseDatabase(text, atPos) ?? currentDatabase;
         }
 
         public static SqlConnectionInfo GetActiveConnectionInfo()

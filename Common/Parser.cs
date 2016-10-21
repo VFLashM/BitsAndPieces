@@ -15,11 +15,11 @@ namespace Common
             @"use\s+(?<db>[a-zA-Z_@#][a-zA-Z_@#$0-9]*)", // regular identifier
         }), RegexOptions.RightToLeft);
 
-        public static string ParseUseDatabase(string text, int atPos = null)
+        public static string ParseUseDatabase(string text, int? atPos = null)
         {
-            if (atPos != null)
+            if (atPos.HasValue)
             {
-                text = text.Substring(0, atPos);
+                text = text.Substring(0, atPos.Value);
             }
             var match = useDatabaseRegex.Match(text);
             return match.Success ? match.Groups["db"].Value : null;

@@ -52,8 +52,7 @@ namespace Opener
             }
             string name = text.Substring(from, to - from);
 
-            string prefix = text.Substring(0, from);
-            string database = Common.Connection.GetActiveDatabase(prefix);
+            string database = Common.Connection.GetActiveDatabase(text, from);
 
             var accessor = new ObjectAccessor();
             ObjectAccessor.ObjectInfo info = accessor.FindObject(name, database);
