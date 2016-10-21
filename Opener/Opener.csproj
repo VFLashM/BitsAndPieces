@@ -96,12 +96,6 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ChooseItem.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ChooseItem.Designer.cs">
-      <DependentUpon>ChooseItem.cs</DependentUpon>
-    </Compile>
     <Compile Include="Configuration.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -188,9 +182,6 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ChooseItem.resx">
-      <DependentUpon>ChooseItem.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Configuration.resx">
       <DependentUpon>Configuration.cs</DependentUpon>
     </EmbeddedResource>

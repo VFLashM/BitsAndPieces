@@ -8,11 +8,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
-namespace Opener
+namespace Common
 {
     public partial class ChooseItem : Form
     {
-        class SearchTerm : IComparable
+        public class SearchTerm : IComparable
         {
             public readonly string value;
             public readonly int priority;
@@ -75,25 +75,22 @@ namespace Opener
             public readonly string type;
             readonly SearchTerm[] searchTerms;
 
-            public Item(string value, string type)
+            public Item(string value, string type, SearchTerm[] searchTerms = null)
             {
-                var searchTerms = new List<SearchTerm>();
-                searchTerms.Add(new SearchTerm(type, 0));
-                searchTerms.Add(new SearchTerm(value, 1));
-                int priority = 2;
-                foreach (var part in value.Split('.'))
-                {
-                    foreach (var term in part.Split(':'))
-                    {
-                        searchTerms.Add(new SearchTerm(term, priority));
-                    }
-                    ++priority;
-                }
-                searchTerms.Sort();
-
                 this.value = value;
-                this.type = type; 
-                this.searchTerms = searchTerms.ToArray();
+                this.type = type;
+                if (searchTerms != null)
+                {
+                    this.searchTerms = searchTerms;
+                }
+                else
+                {
+                    this.searchTerms = new SearchTerm[] {
+                        new SearchTerm(value, 2),
+                        new SearchTerm(type, 1),
+                    };
+                }
+                Array.Sort(this.searchTerms);
             }
 
             public float? Match(string template)

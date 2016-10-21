@@ -1,4 +1,4 @@
-﻿namespace Opener
+﻿namespace Common
 {
     partial class ChooseItem
     {
