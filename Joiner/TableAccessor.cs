@@ -54,18 +54,14 @@ select fk.object_id as fk_id,
        SCHEMA_NAME(fk.schema_id) as fk_schema, 
        fk.name as fk_name, 
 
-       SCHEMA_NAME(base.schema_id) as base_schema, 
-       base.name as base_name, 
+       OBJECT_SCHEMA_NAME(fk.parent_object_id) as base_schema, 
+       OBJECT_NAME(fk.parent_object_id) as base_name, 
        basecol.name as base_column,
 
-       SCHEMA_NAME(ref.schema_id) as ref_schema, 
-       ref.name as ref_name, 
+       OBJECT_SCHEMA_NAME(fk.referenced_object_id) as ref_schema, 
+       OBJECT_NAME(fk.referenced_object_id) as ref_name, 
        refcol.name as ref_column
 from sys.foreign_keys fk
-join sys.tables base
-  on base.object_id = fk.parent_object_id
-join sys.tables ref
-  on ref.object_id = fk.referenced_object_id
 join sys.foreign_key_columns fkc
   on fkc.constraint_object_id = fk.object_id
 join sys.columns basecol
