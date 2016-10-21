@@ -8,6 +8,39 @@ namespace Joiner
 {
     class Rule
     {
+        public class Builder
+        {
+            private Rule rule;
+
+            public Builder(TableInfo t1, TableInfo t2, string name)
+            {
+                rule = new Rule(t1, t2, "", name);
+            }
+
+            public void Add(string c1, string c2)
+            {
+                if (rule.condition != "")
+                {
+                    rule.condition += " and ";
+                }
+                rule.condition += rule.t1.Alias() + "." + c1 + " = " + rule.t2.Alias() + "." + c2;
+            }
+
+            public Rule Finish()
+            {
+                var res = rule;
+                rule = null;
+                return res;
+            }
+
+            public static Rule CreateSimple(TableInfo t1, string c1, TableInfo t2, string c2, string name)
+            {
+                var builder = new Builder(t1, t2, name);
+                builder.Add(c1, c2);
+                return builder.Finish();
+            }
+        }
+
         TableInfo t1;
         TableInfo t2;
         string condition;
@@ -41,10 +74,6 @@ namespace Joiner
 
         public string Apply(TableInfo a1, TableInfo a2)
         {
-            if (a1.Match(t2) && a2.Match(t1))
-            {
-                return Apply(a2, a1);
-            }
             if (a1.Match(t1) && a2.Match(t2))
             {
                 Regex pattern = new Regex(@"\b(?<alias>" + Regex.Escape(t1.Alias()) + "|" + Regex.Escape(t2.Alias()) + @")\.", RegexOptions.RightToLeft);
@@ -63,6 +92,10 @@ namespace Joiner
                     res = res.Substring(0, match.Index) + replacement + "." + res.Substring(match.Index + match.Length);
                 }
                 return res;
+            } 
+            else if (a1.Match(t2) && a2.Match(t1))
+            {
+                return Apply(a2, a1);
             }
             return null;
         }

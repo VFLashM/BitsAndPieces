@@ -7,14 +7,25 @@ namespace Joiner
 {
     class RuleGenerator
     {
-        public static Rule Create(TableInfo t1, TableInfo t2)
+        public static List<Rule> Create(TableInfo t1, TableInfo t2)
         {
-            return null;
-        }
+            var rules = new List<Rule>();
+            var c1 = t1.Columns();
+            var c2 = t2.Columns();
+            if (c1 == null || c2 == null)
+            {
+                return rules;
+            }
 
-        public static Rule CreateSelf(TableInfo t)
-        {
-            return null;
+            foreach (var common in c1.Intersect(c2))
+            {
+                rules.Add(Rule.Builder.CreateSimple(t1, common, t2, common, "auto"));
+            }
+
+            if (rules.Count == 0)
+            {
+            }
+            return rules;
         }
     }
 }

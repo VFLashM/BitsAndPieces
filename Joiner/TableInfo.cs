@@ -35,7 +35,7 @@ namespace Joiner
             return columns;
         }
 
-        public void Bind(Table table)
+        public void Bind(TableViewBase table)
         {
             this.urn = table.Urn;
             this.columns = new List<string>();
@@ -54,6 +54,17 @@ namespace Joiner
         {
             return String.Join(".", id) + (alias != null ? (" as " + alias) : "");
         }
+
+        /*
+        public TableInfo Renamed(string newAlias)
+        {
+            var renamed = new TableInfo(id, newAlias);
+            renamed.urn = urn;
+            renamed.columns = columns;
+            renamed.primaryKey = primaryKey;
+            return renamed;
+        }
+         */
 
         public bool Match(TableInfo other)
         {

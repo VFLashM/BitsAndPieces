@@ -26,9 +26,16 @@ namespace Joiner
             _dbForeignKeyRules = new Dictionary<string, List<Rule>>();
         }
 
-        Table FindTable(Database db, string schema, string name)
+        TableViewBase FindTable(Database db, string schema, string name)
         {
             foreach (Table tab in db.Tables)
+            {
+                if ((name == tab.Name) && (String.IsNullOrEmpty(schema) || (tab.Schema == schema)))
+                {
+                    return tab;
+                }
+            }
+            foreach (View tab in db.Views)
             {
                 if ((name == tab.Name) && (String.IsNullOrEmpty(schema) || (tab.Schema == schema)))
                 {
@@ -70,10 +77,9 @@ join sys.columns refcol
 ");
             var table = dataSet.Tables[0];
             int? lastFk = null;
-            string lastFkName = null;
+            Rule.Builder builder = null;
             TableInfo baseTable = null;
             TableInfo refTable = null;
-            string condition = null;
             foreach (DataRow row in table.Rows)
             {
                 int? fkId = row["fk_id"] as int?;
@@ -90,25 +96,20 @@ join sys.columns refcol
 
                 if (lastFk != fkId)
                 {
-                    if (condition != null)
+                    if (builder != null)
                     {
-                        rules.Add(new Rule(baseTable, refTable, condition, lastFkName));
+                        rules.Add(builder.Finish());
                     }
                     lastFk = fkId;
-                    lastFkName = fkName;
-                    baseTable = CreateTableInfo(FindTable(db, baseSchema, baseName));
-                    refTable = CreateTableInfo(FindTable(db, refSchema, refName));
-                    condition = "";
+                    baseTable = CreateTableInfo(database, FindTable(db, baseSchema, baseName));
+                    refTable = CreateTableInfo(database, FindTable(db, refSchema, refName));
+                    builder = new Rule.Builder(baseTable, refTable, fkName);
                 }
-                if (!String.IsNullOrEmpty(condition))
-                {
-                    condition += " and ";
-                }
-                condition += baseTable.Alias() + "." + baseColumn + " = " + refTable.Alias() + "." + refColumn;
+                builder.Add(baseColumn, refColumn);
             }
-            if (condition != null)
+            if (builder != null)
             {
-                rules.Add(new Rule(baseTable, refTable, condition, lastFkName));
+                rules.Add(builder.Finish());
             }
             
             return rules;
@@ -150,12 +151,12 @@ join sys.columns refcol
             return alias;
         }
 
-        public TableInfo CreateTableInfo(Table table)
+        public TableInfo CreateTableInfo(string database, TableViewBase table)
         {
             var id = new List<string>();
-            if (table.Parent.Name != _defaultDatabase)
+            if (database != _defaultDatabase)
             {
-                id.Add(table.Parent.Name);
+                id.Add(database);
             }
             if (table.Schema != "dbo")
             {
@@ -183,7 +184,7 @@ join sys.columns refcol
             }
 
             Database db = _server.Databases[database];
-            Table tab = FindTable(db, schema, id.Last());
+            TableViewBase tab = FindTable(db, schema, id.Last());
             if (tab != null)
             {
                 t.Bind(tab);

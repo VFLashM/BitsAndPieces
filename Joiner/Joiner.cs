@@ -150,14 +150,6 @@ namespace Joiner
             {
                 rules.AddRange(tableAccessor.GetForeignKeyRules(contextDatabase));
             }
-            foreach (var tab in context.AllTables())
-            {
-                var generated = RuleGenerator.CreateSelf(tab);
-                if (generated != null)
-                {
-                    rules.Add(generated);
-                }
-            }
             foreach (var t1 in context.AllTables())
             {
                 foreach (var t2 in context.AllTables())
@@ -180,7 +172,7 @@ namespace Joiner
                         var generated = RuleGenerator.Create(t1, t2);
                         if (generated != null)
                         {
-                            rules.Add(generated);
+                            rules.AddRange(generated);
                         }
                     }
                 }
