@@ -13,6 +13,7 @@ namespace Joiner
         private Urn urn = null;
         private string alias;
         private List<string> columns = null;
+        private List<string> primaryKey = null;
 
         public TableInfo(List<string> id, string alias)
         {
@@ -35,6 +36,11 @@ namespace Joiner
             return columns;
         }
 
+        public List<string> PrimaryKey()
+        {
+            return primaryKey;
+        }
+
         public void Bind(TableViewBase table)
         {
             this.urn = table.Urn;
@@ -42,6 +48,17 @@ namespace Joiner
             foreach (Column col in table.Columns)
             {
                 this.columns.Add(col.Name);
+            }
+            foreach (Index ind in table.Indexes)
+            {
+                if (ind.IndexKeyType == IndexKeyType.DriPrimaryKey)
+                {
+                    this.primaryKey = new List<string>();
+                    foreach (IndexedColumn col in ind.IndexedColumns)
+                    {
+                        this.primaryKey.Add(col.Name);
+                    }
+                }
             }
         }
 
