@@ -33,6 +33,35 @@ namespace Joiner
             return match.Success;
         }
 
+        static bool ConsumeParens(ref string str)
+        {
+            if (!str.StartsWith("("))
+            {
+                return false;
+            }
+            int offset = 0;
+            int balance = 0;
+            while (offset < str.Length)
+            {
+                switch (str[offset])
+                {
+                    case ')':
+                        balance -= 1;
+                        break;
+                    case '(':
+                        balance += 1;
+                        break;
+                }
+                offset += 1;
+                if (balance == 0)
+                {
+                    str = str.Substring(offset);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         static bool ConsumeId(ref string str, out List<String> id)
         {
             id = new List<string>();

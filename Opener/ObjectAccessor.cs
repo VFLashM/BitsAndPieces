@@ -42,13 +42,7 @@ namespace Opener
 
         public ObjectAccessor()
         {
-            UIConnectionInfo uiConnectionInfo = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
-            SqlConnectionInfo connectionInfo = new SqlConnectionInfo();
-            connectionInfo.ApplicationName = "SSMS Plugin Bits and Pieces";
-            connectionInfo.ServerName = uiConnectionInfo.ServerName;
-            connectionInfo.UserName = uiConnectionInfo.UserName;
-            connectionInfo.Password = uiConnectionInfo.Password;
-            connectionInfo.UseIntegratedSecurity = String.IsNullOrEmpty(uiConnectionInfo.Password);
+            SqlConnectionInfo connectionInfo = Common.Connection.GetActiveConnectionInfo();
             _serverName = connectionInfo.ServerName;
 
             ServerConnection connection = new ServerConnection(connectionInfo);
