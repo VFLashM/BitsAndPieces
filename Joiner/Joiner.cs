@@ -63,13 +63,21 @@ namespace Joiner
 
             var caretPos = wpfTextView.Caret.Position.BufferPosition;
             var bounds = wpfTextView.GetTextViewLineContainingBufferPosition(caretPos).GetCharacterBounds(caretPos);
-            var offset = uiElement.PointToScreen(new System.Windows.Point(0, 0));
 
             double zoomMultiplier = wpfTextView.ZoomLevel / 100.0;
+            double left = (bounds.Left - wpfTextView.ViewportLeft) * zoomMultiplier;
+            double top = (bounds.Top - wpfTextView.ViewportTop) * zoomMultiplier;
+            double bottom = (bounds.Bottom - wpfTextView.ViewportTop) * zoomMultiplier;
+
+            System.Windows.Point topPoint = new System.Windows.Point(left, top);
+            System.Windows.Point bottomPoint = new System.Windows.Point(left, bottom);
+            topPoint = uiElement.PointToScreen(topPoint);
+            bottomPoint = uiElement.PointToScreen(bottomPoint);
+
             return new CaretLocation(
-                Convert.ToInt32(offset.X + (bounds.Right - wpfTextView.ViewportLeft) * zoomMultiplier),
-                Convert.ToInt32(offset.Y + (bounds.Top - wpfTextView.ViewportTop) * zoomMultiplier),
-                Convert.ToInt32(offset.Y + (bounds.Bottom - wpfTextView.ViewportTop) * zoomMultiplier)
+                Convert.ToInt32(topPoint.X),
+                Convert.ToInt32(topPoint.Y),
+                Convert.ToInt32(bottomPoint.Y)
             );
         }
 
