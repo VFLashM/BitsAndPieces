@@ -30,6 +30,11 @@ namespace Joiner
             return id.ToArray();
         }
 
+        public string Database()
+        {
+            return id.Count >= 3 ? id[0] : null;
+        }
+
         public void SetUrn(Urn urn)
         {
             this.urn = urn;

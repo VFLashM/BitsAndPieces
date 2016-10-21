@@ -17,5 +17,16 @@ namespace Joiner
             this.newTable = newTable;
             this.hasGlue = hasGlue;
         }
+
+        public List<TableInfo> AllTables()
+        {
+            var res = new List<TableInfo>();
+            res.AddRange(joinedTables);
+            if (newTable != null)
+            {
+                res.Add(newTable);
+            }
+            return res;
+        }
     }
 }

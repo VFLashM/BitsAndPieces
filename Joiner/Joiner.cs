@@ -137,22 +137,18 @@ namespace Joiner
 
             string database = Common.Connection.GetActiveDatabase(body);
             var tableAccessor = new TableAccessor(database);
-            var rules = new List<Rule>();
-            foreach (TableInfo t in context.joinedTables)
+
+            var contextDatabases = new HashSet<string>();
+            foreach (TableInfo t in context.AllTables())
             {
-                var trules = tableAccessor.ResolveTable(t);
-                if (trules != null)
-                {
-                    rules.AddRange(trules);
-                }
+                tableAccessor.ResolveTable(t);
+                contextDatabases.Add(t.Database() ?? database);
             }
-            if (context.newTable != null)
+
+            var rules = new List<Rule>();
+            foreach (var contextDatabase in contextDatabases)
             {
-                var trules = tableAccessor.ResolveTable(context.newTable);
-                if (trules != null)
-                {
-                    rules.AddRange(trules);
-                }
+                rules.AddRange(tableAccessor.GetForeignKeyRules(contextDatabase));
             }
 
             var options = new List<string>();

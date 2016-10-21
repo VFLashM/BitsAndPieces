@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.Common;
 using System.Diagnostics;
+using System.Data;
+using Microsoft.SqlServer.Management.Sdk.Sfc;
 
 namespace Joiner
 {
@@ -12,6 +14,7 @@ namespace Joiner
     {
         Server _server;
         string _defaultDatabase;
+        Dictionary<string, List<Rule>> _dbForeignKeyRules;
 
         public TableAccessor(string defaultDatabase)
         {
@@ -20,6 +23,104 @@ namespace Joiner
             connection.Connect();
             _server = new Server(connection);
             _defaultDatabase = defaultDatabase;
+            _dbForeignKeyRules = new Dictionary<string, List<Rule>>();
+        }
+
+        Table FindTable(Database db, string schema, string name)
+        {
+            foreach (Table tab in db.Tables)
+            {
+                if ((name == tab.Name) && (String.IsNullOrEmpty(schema) || (tab.Schema == schema)))
+                {
+                    return tab;
+                }
+            }
+            return null;
+        }
+
+        List<Rule> LoadForeignKeyRules(string database)
+        {
+            var rules = new List<Rule>();
+            Database db = _server.Databases[database];
+            var dataSet = db.ExecuteWithResults(@"
+select fk.object_id as fk_id,
+       SCHEMA_NAME(fk.schema_id) as fk_schema, 
+       fk.name as fk_name, 
+
+       SCHEMA_NAME(base.schema_id) as base_schema, 
+       base.name as base_name, 
+       basecol.name as base_column,
+
+       SCHEMA_NAME(ref.schema_id) as ref_schema, 
+       ref.name as ref_name, 
+       refcol.name as ref_column
+from sys.foreign_keys fk
+join sys.tables base
+  on base.object_id = fk.parent_object_id
+join sys.tables ref
+  on ref.object_id = fk.referenced_object_id
+join sys.foreign_key_columns fkc
+  on fkc.constraint_object_id = fk.object_id
+join sys.columns basecol
+  on basecol.object_id = fkc.parent_object_id
+ and basecol.column_id = fkc.parent_column_id
+join sys.columns refcol
+  on refcol.object_id = fkc.referenced_object_id
+ and refcol.column_id = fkc.referenced_column_id 
+");
+            var table = dataSet.Tables[0];
+            int? lastFk = null;
+            TableInfo baseTable = null;
+            TableInfo refTable = null;
+            string condition = null;
+            foreach (DataRow row in table.Rows)
+            {
+                int? fkId = row["fk_id"] as int?;
+                string fkSchema = row["fk_schema"] as string;
+                string fkName = row["fk_name"] as string;
+
+                string baseSchema = row["base_schema"] as string;
+                string baseName = row["base_name"] as string;
+                string baseColumn = row["base_column"] as string;
+
+                string refSchema = row["ref_schema"] as string;
+                string refName = row["ref_name"] as string;
+                string refColumn = row["ref_column"] as string;
+
+                if (lastFk != fkId)
+                {
+                    if (condition != null)
+                    {
+                        rules.Add(new Rule(baseTable, refTable, condition));
+                    }
+                    lastFk = fkId;
+                    baseTable = CreateTableInfo(FindTable(db, baseSchema, baseName));
+                    refTable = CreateTableInfo(FindTable(db, refSchema, refName));
+                    condition = "";
+                }
+                if (!String.IsNullOrEmpty(condition))
+                {
+                    condition += " and ";
+                }
+                condition += baseTable.Alias() + "." + baseColumn + " = " + refTable.Alias() + "." + refColumn;
+            }
+            if (condition != null)
+            {
+                rules.Add(new Rule(baseTable, refTable, condition));
+            }
+            
+            return rules;
+        }
+
+        public List<Rule> GetForeignKeyRules(string database)
+        {
+            List<Rule> rules;
+            if (!_dbForeignKeyRules.TryGetValue(database, out rules))
+            {
+                rules = LoadForeignKeyRules(database);
+                _dbForeignKeyRules[database] = rules;
+            }
+            return rules;
         }
 
         public string AliasFromName(string name)
@@ -66,71 +167,24 @@ namespace Joiner
             return new TableInfo(id, table.Urn, AliasFromName(table.Name));
         }
 
-        public List<Rule> GetTableRules(Table table)
-        {
-            var rules = new List<Rule>();
-            foreach (ForeignKey key in table.ForeignKeys)
-            {
-                string condition = "";
-
-                Table refTable = null;
-                foreach (Table other in table.Parent.Tables)
-                {
-                    if (other.Name == key.ReferencedTable && other.Schema == key.ReferencedTableSchema)
-                    {
-                        refTable = other;
-                        break;
-                    }
-                }
-
-                Index refKey = null;
-                foreach (Index index in refTable.Indexes)
-                {
-                    if (index.Name == key.ReferencedKey)
-                    {
-                        refKey = index;
-                        break;
-                    }
-                }
-
-                int maxCount = Math.Max(key.Columns.Count, refKey.IndexedColumns.Count);
-                for (int i = 0; i < maxCount; ++i)
-                {
-                    condition += AliasFromName(table.Name) + "." + key.Columns[i].Name + " == " +
-                              AliasFromName(refTable.Name) + "." + refKey.IndexedColumns[i].Name;
-                }
-                
-                rules.Add(new Rule(
-                    CreateTableInfo(table), 
-                    CreateTableInfo(refTable),
-                    condition));
-            }
-            return rules;
-        }
-
-        public List<Rule> ResolveTable(TableInfo t)
+        public bool ResolveTable(TableInfo t)
         {
             string database = _defaultDatabase;
+            string schema = null;
             var id = t.GetId();
             if (id.Length > 2)
             {
                 database = id[0];
+                schema = id[1];
             }
 
             Database db = _server.Databases[database];
-            foreach (Table tab in db.Tables)
+            Table tab = FindTable(db, schema, id.Last());
+            if (tab != null)
             {
-                if (tab.Name == id.Last())
-                {
-                    if (id.Length < 3 || id[1] == null || id[1] == tab.Schema)
-                    {
-                        t.SetUrn(tab.Urn);
-                        return GetTableRules(tab);
-                    }
-                }
+                t.SetUrn(tab.Urn);
             }
-
-            return null;
+            return tab != null;
         }
     }
 }
