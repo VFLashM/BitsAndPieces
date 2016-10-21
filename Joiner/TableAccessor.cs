@@ -70,6 +70,7 @@ join sys.columns refcol
 ");
             var table = dataSet.Tables[0];
             int? lastFk = null;
+            string lastFkName = null;
             TableInfo baseTable = null;
             TableInfo refTable = null;
             string condition = null;
@@ -91,9 +92,10 @@ join sys.columns refcol
                 {
                     if (condition != null)
                     {
-                        rules.Add(new Rule(baseTable, refTable, condition));
+                        rules.Add(new Rule(baseTable, refTable, condition, lastFkName));
                     }
                     lastFk = fkId;
+                    lastFkName = fkName;
                     baseTable = CreateTableInfo(FindTable(db, baseSchema, baseName));
                     refTable = CreateTableInfo(FindTable(db, refSchema, refName));
                     condition = "";
@@ -106,7 +108,7 @@ join sys.columns refcol
             }
             if (condition != null)
             {
-                rules.Add(new Rule(baseTable, refTable, condition));
+                rules.Add(new Rule(baseTable, refTable, condition, lastFkName));
             }
             
             return rules;

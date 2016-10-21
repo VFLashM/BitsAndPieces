@@ -151,7 +151,7 @@ namespace Joiner
                 rules.AddRange(tableAccessor.GetForeignKeyRules(contextDatabase));
             }
 
-            var options = new List<string>();
+            var options = new List<Tuple<string, string>>();
             if (context.newTable != null)
             {
                 foreach (var rule in rules)
@@ -165,7 +165,7 @@ namespace Joiner
                             {
                                 applied = "on " + applied;
                             }
-                            options.Add(applied);
+                            options.Add(Tuple.Create(applied, rule.name));
                         }
                     }
                 }
@@ -182,7 +182,7 @@ namespace Joiner
                             string applied = context.hasGlue ? "" : "join ";
                             applied += matched.Def() + " on ";
                             applied += rule.Apply(table, matched);
-                            options.Add(applied);
+                            options.Add(Tuple.Create(applied, rule.name));
                         }
                     }
                 }
@@ -191,7 +191,7 @@ namespace Joiner
             var items = new List<Common.ChooseItem.Item>();
             foreach (var option in options)
             {
-                items.Add(new Common.ChooseItem.Item(option, "rule"));
+                items.Add(new Common.ChooseItem.Item(option.Item1, option.Item2));
             }
 
             Common.ChooseItem dialog = new Common.ChooseItem(items.ToArray(), null);

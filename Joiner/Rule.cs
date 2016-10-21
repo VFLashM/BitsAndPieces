@@ -11,12 +11,14 @@ namespace Joiner
         TableInfo t1;
         TableInfo t2;
         string condition;
+        public readonly string name;
 
-        public Rule(TableInfo t1, TableInfo t2, string condition)
+        public Rule(TableInfo t1, TableInfo t2, string condition, string name)
         {
             this.t1 = t1;
             this.t2 = t2;
             this.condition = condition;
+            this.name = name;
         }
 
         public TableInfo Match(TableInfo first)
