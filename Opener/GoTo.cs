@@ -12,12 +12,6 @@ namespace Opener
 {
     class GoTo
     {
-        static readonly Regex databaseRegex = new Regex(String.Join("|", new string[] {
-            @"use\s+\[(?<db>[^\]]+)\]", // brackets identifier
-            @"use\s+""(?<db>[^""]+)""", // quoted identifier
-            @"use\s+(?<db>[a-zA-Z_@#][a-zA-Z_@#$0-9]*)", // regular identifier
-        }), RegexOptions.RightToLeft);
-
         static bool IsId(char c)
         {
             return Char.IsLetter(c) 
@@ -58,14 +52,8 @@ namespace Opener
             }
             string name = text.Substring(from, to - from);
 
-            string database = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo.AdvancedOptions["DATABASE"];
-
             string prefix = text.Substring(0, from);
-            var match = databaseRegex.Match(prefix);
-            if (match.Success)
-            {
-                database = match.Groups["db"].Value;
-            }
+            string database = Common.Connection.GetActiveDatabase(prefix);
 
             var accessor = new ObjectAccessor();
             ObjectAccessor.ObjectInfo info = accessor.FindObject(name, database);

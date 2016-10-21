@@ -126,6 +126,12 @@
   <ItemGroup>
     <Content Include="Joiner.AddIn" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{13A4E091-15E3-444E-B01F-73F71D707652}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
     <PreBuildEvent>copy "$(ProjectDir)Joiner.AddIn" "$(OutDir)"</PreBuildEvent>

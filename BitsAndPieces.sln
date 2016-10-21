@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Opener", "Opener\Opener.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Joiner", "Joiner\Joiner.csproj", "{F907FCAE-52C5-4034-B9FC-67C355971F41}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{13A4E091-15E3-444E-B01F-73F71D707652}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{F907FCAE-52C5-4034-B9FC-67C355971F41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F907FCAE-52C5-4034-B9FC-67C355971F41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F907FCAE-52C5-4034-B9FC-67C355971F41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13A4E091-15E3-444E-B01F-73F71D707652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13A4E091-15E3-444E-B01F-73F71D707652}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13A4E091-15E3-444E-B01F-73F71D707652}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13A4E091-15E3-444E-B01F-73F71D707652}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
