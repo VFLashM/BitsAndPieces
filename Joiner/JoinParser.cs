@@ -104,7 +104,7 @@ namespace Joiner
 
             Match match;
             string alias = null;
-            string beforeAliasStr = str;
+            string beforeAliasStr = str;    
             if (ConsumeRegex(ref str, aliasRegex, out match))
             {
                 alias = match.Groups["alias"].Value;
