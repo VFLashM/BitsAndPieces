@@ -19,24 +19,58 @@ namespace Opener
 
         public class ObjectInfo
         {
-            readonly public string name;
-            readonly public string schema;
-            readonly public Urn urn;
             readonly public string type;
+            readonly public string database;
+            readonly public string schema;
+            readonly public string name;
+            readonly public string subname;
+            readonly public Urn urn;
+            readonly public string fullName;
 
-            public ObjectInfo(string database, string schema, string name, Urn urn, string type)
+            string CreateFullName()
             {
-                this.name = database + ((schema != null) ? ("." + schema + ".") : ".") + name;
-                this.schema = schema;
-                this.urn = urn;
+                string res = database;
+                if (schema != null)
+                {
+                    res += '.' + schema;
+                }
+                res += '.' + name;
+                if (subname != null)
+                {
+                    res += ':' + subname;
+                }
+                return res;
+            }
+
+            public ObjectInfo(string database, NamedSmoObject obj, string type)
+            {
                 this.type = type;
+                this.database = database;
+                this.schema = null;
+                this.name = obj.Name;
+                this.subname = null;
+                this.urn = obj.Urn;
+                this.fullName = CreateFullName();
             }
             public ObjectInfo(string database, ScriptSchemaObjectBase obj, string type)
             {
-                this.name = database + "." + obj.Schema + "." + obj.Name;
-                this.schema = obj.Schema;
-                this.urn = obj.Urn;
                 this.type = type;
+                this.database = database;
+                this.schema = obj.Schema;
+                this.name = obj.Name;
+                this.subname = null;
+                this.urn = obj.Urn;
+                this.fullName = CreateFullName();
+            }
+            public ObjectInfo(string database, ScriptSchemaObjectBase parent, NamedSmoObject subobj, string type)
+            {
+                this.type = type;
+                this.database = database;
+                this.schema = parent.Schema;
+                this.name = parent.Name;
+                this.subname = subobj.Name;
+                this.urn = subobj.Urn;
+                this.fullName = CreateFullName();
             }
         }
 
@@ -115,18 +149,18 @@ namespace Opener
                         result.Add(new ObjectInfo(database.Name, obj, "table"));
                         foreach (Trigger trig in obj.Triggers)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + trig.Name, trig.Urn, "trigger"));
+                            result.Add(new ObjectInfo(database.Name, obj, trig, "trigger"));
                         }
                         /* somewhat useful, but slow everyhing down too much
                         foreach (Index ind in obj.Indexes)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + ind.Name, ind.Urn, "index"));
+                            result.Add(new ObjectInfo(database.Name, obj, ind, "index"));
                         }
                         foreach (Check chk in obj.Checks)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + chk.Name, chk.Urn, "constraint"));
+                            result.Add(new ObjectInfo(database.Name, obj, chk, "constraint"));
                         }
-                         */
+                        */
                     }
                     foreach (View obj in database.Views)
                     {
@@ -134,11 +168,11 @@ namespace Opener
                         /* somewhat useful, but slow everyhing down too much
                         foreach (Trigger trig in obj.Triggers)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + trig.Name, trig.Urn, "view trigger"));
+                            result.Add(new ObjectInfo(database.Name, obj, trig, "view trigger"));
                         }
                         foreach (Index ind in obj.Indexes)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj.Schema, obj.Name + ":" + ind.Name, ind.Urn, "view index"));
+                            result.Add(new ObjectInfo(database.Name, obj, ind, "view index"));
                         }
                          */
                     }
@@ -164,7 +198,7 @@ namespace Opener
                     }
                     foreach (DatabaseDdlTrigger obj in database.Triggers)
                     {
-                        result.Add(new ObjectInfo(database.Name, null, obj.Name, obj.Urn, "ddl trigger"));
+                        result.Add(new ObjectInfo(database.Name, obj, "ddl trigger"));
                     }
                     /* these are not very useful it seems
                     foreach (Rule obj in database.Rules)
@@ -173,8 +207,7 @@ namespace Opener
                     }
                     foreach (SqlAssembly obj in database.Assemblies)
                     {
-                        var name = database.Name + '.' + obj.Name;
-                        result.Add(new ObjectInfo(name, obj.Urn, "assembly"));
+                        result.Add(new ObjectInfo(database.Name, obj, "assembly"));
                     }
                     foreach (Default obj in database.Defaults)
                     {
@@ -182,8 +215,7 @@ namespace Opener
                     }
                     foreach (PlanGuide obj in database.PlanGuides)
                     {
-                        var name = database.Name + '.' + obj.Name;
-                        result.Add(new ObjectInfo(name, obj.Urn, "plan guide"));
+                        result.Add(new ObjectInfo(database.Name, obj, "plan guide"));
                     }
                      */
                 }

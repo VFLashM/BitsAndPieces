@@ -8,19 +8,20 @@ namespace Opener
 {
     class QuickOpen
     {
-        static Common.ChooseItem.SearchTerm[] CreateSearchTerms(string name, string type)
+        static Common.ChooseItem.SearchTerm[] CreateSearchTerms(ObjectAccessor.ObjectInfo obj)
         {
             var searchTerms = new List<Common.ChooseItem.SearchTerm>();
-            searchTerms.Add(new Common.ChooseItem.SearchTerm(type, 0));
-            searchTerms.Add(new Common.ChooseItem.SearchTerm(name, 1));
-            int priority = 2;
-            foreach (var part in name.Split('.'))
+            searchTerms.Add(new Common.ChooseItem.SearchTerm(obj.type, 0));
+            searchTerms.Add(new Common.ChooseItem.SearchTerm(obj.fullName, 1));
+            searchTerms.Add(new Common.ChooseItem.SearchTerm(obj.database, 2));
+            if (obj.schema != null)
             {
-                foreach (var term in part.Split(':'))
-                {
-                    searchTerms.Add(new Common.ChooseItem.SearchTerm(term, priority));
-                }
-                ++priority;
+                searchTerms.Add(new Common.ChooseItem.SearchTerm(obj.schema, 2));
+            }
+            searchTerms.Add(new Common.ChooseItem.SearchTerm(obj.name, 3));
+            if (obj.subname != null)
+            {
+                searchTerms.Add(new Common.ChooseItem.SearchTerm(obj.subname, 3));
             }
             return searchTerms.ToArray();
         }
@@ -34,9 +35,9 @@ namespace Opener
             var items = new List<Common.ChooseItem.Item>();
             foreach (var obj in objects)
             {
-                strToUrn[obj.name] = obj.urn;
-                var searchTerms = CreateSearchTerms(obj.name, obj.type);
-                items.Add(new Common.ChooseItem.Item(obj.name, obj.type, searchTerms));
+                strToUrn[obj.fullName] = obj.urn;
+                var searchTerms = CreateSearchTerms(obj);
+                items.Add(new Common.ChooseItem.Item(obj.fullName, obj.type, searchTerms));
             }
 
             string title = "Choose object on " + accessor.ServerName();
