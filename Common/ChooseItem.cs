@@ -143,6 +143,16 @@ namespace Common
 
         public ChooseItem(Item[] items, string title)
         {
+            if (title != null)
+            {
+                Text = title;
+            }
+            else
+            {
+                this.ControlBox = false;
+                this.Text = String.Empty;
+            }
+
             InitializeComponent();
             KeyPreview = true;
 
@@ -152,15 +162,17 @@ namespace Common
             list.DoubleClick += new EventHandler(list_DoubleClick);
             list.Resize += new EventHandler(list_Resize);
             text.TextChanged += new EventHandler(text_TextChanged);
+            
+            if (title == null)
+            {
+                list.Width = this.Width;
+                list.Top = 0;
+                list.Left = 0;
+                list.Height = this.Height - text.Height;
 
-            if (title != null)
-            {
-                Text = title;
-            }
-            else
-            {
-                this.ControlBox = false;
-                this.Text = String.Empty;
+                text.Width = this.Width;
+                text.Left = 0;
+                text.Top = list.Height;
             }
         }
 
