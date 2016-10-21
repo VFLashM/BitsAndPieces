@@ -7,9 +7,9 @@ namespace Joiner
 {
     class ContextInfo
     {
-        List<TableInfo> joinedTables;
-        TableInfo newTable;
-        bool hasGlue;
+        public readonly List<TableInfo> joinedTables;
+        public readonly TableInfo newTable;
+        public readonly bool hasGlue;
 
         public ContextInfo(List<TableInfo> joinedTables, TableInfo newTable, bool hasGlue)
         {

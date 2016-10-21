@@ -152,7 +152,16 @@ namespace Common
             list.DoubleClick += new EventHandler(list_DoubleClick);
             list.Resize += new EventHandler(list_Resize);
             text.TextChanged += new EventHandler(text_TextChanged);
-            Text = title;
+
+            if (title != null)
+            {
+                Text = title;
+            }
+            else
+            {
+                this.ControlBox = false;
+                this.Text = String.Empty;
+            }
         }
 
         void list_Resize(object sender, EventArgs e)
