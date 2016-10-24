@@ -79,21 +79,19 @@ namespace Joiner
             return alias ?? id.Last();
         }
 
-        public string Def()
+        public string Def(string currentDatabase)
         {
-            return String.Join(".", id) + (alias != null ? (" as " + alias) : "");
+            var localId = this.id.ToList();
+            if (currentDatabase == Database())
+            {
+                localId.RemoveAt(0);
+                if (String.IsNullOrWhiteSpace(localId[0]))
+                {
+                    localId.RemoveAt(0);
+                }
+            }
+            return String.Join(".", localId) + ((alias != null) ? (" as " + alias) : "");
         }
-
-        /*
-        public TableInfo Renamed(string newAlias)
-        {
-            var renamed = new TableInfo(id, newAlias);
-            renamed.urn = urn;
-            renamed.columns = columns;
-            renamed.primaryKey = primaryKey;
-            return renamed;
-        }
-         */
 
         public bool Match(TableInfo other)
         {

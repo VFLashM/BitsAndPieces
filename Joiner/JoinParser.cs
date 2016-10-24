@@ -337,36 +337,37 @@ namespace Joiner
 
         static Rule ParseCustomRule(string body)
         {
+            string src = body;
             TableInfo t1;
             if (!ConsumeTable(ref body, out t1, null))
             {
-                throw new Common.Error("Unable to parse first table of custom rule:\n" + body);
+                throw new Common.Error("Unable to parse first table of custom rule:\n" + src);
             }
 
             string join;
             if (!ConsumeWord(ref body, out join))
             {
-                throw new Common.Error("Unable to parse 'join' of custom rule:\n" + body);
+                throw new Common.Error("Unable to parse 'join' of custom rule:\n" + src);
             }
             if (join.ToLower() != "join")
             {
-                throw new Common.Error("'Join' keyword not found in custom rule:\n" + body);
+                throw new Common.Error("'Join' keyword not found in custom rule:\n" + src);
             }
 
             TableInfo t2;
             if (!ConsumeTable(ref body, out t2, null))
             {
-                throw new Common.Error("Unable to parse second table of custom rule:\n" + body);
+                throw new Common.Error("Unable to parse second table of custom rule:\n" + src);
             }
 
             string on;
             if (!ConsumeWord(ref body, out on))
             {
-                throw new Common.Error("Unable to parse 'on' of custom rule:\n" + body);
+                throw new Common.Error("Unable to parse 'on' of custom rule:\n" + src);
             }
-            if (join.ToLower() != "on")
+            if (on.ToLower() != "on")
             {
-                throw new Common.Error("'On' keyword not found in custom rule:\n" + body);
+                throw new Common.Error("'On' keyword not found in custom rule:\n" + src);
             }
 
             return new Rule(t1, t2, body, "custom", 4);

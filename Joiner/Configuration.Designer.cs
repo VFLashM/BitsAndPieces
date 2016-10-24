@@ -35,13 +35,15 @@
             // rulesText
             // 
             this.rulesText.AcceptsReturn = true;
+            this.rulesText.AcceptsTab = true;
             this.rulesText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.rulesText.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Joiner.Properties.Settings.Default, "Custom", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.rulesText.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Joiner.Properties.Settings.Default, "CustomRules", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.rulesText.Location = new System.Drawing.Point(3, 26);
             this.rulesText.Multiline = true;
             this.rulesText.Name = "rulesText";
+            this.rulesText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.rulesText.Size = new System.Drawing.Size(605, 398);
             this.rulesText.TabIndex = 0;
             this.rulesText.Text = global::Joiner.Properties.Settings.Default.CustomRules;

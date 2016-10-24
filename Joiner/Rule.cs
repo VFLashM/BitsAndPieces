@@ -101,5 +101,10 @@ namespace Joiner
             }
             return null;
         }
+
+        internal TableInfo[] AllTables()
+        {
+            return new TableInfo[] { t1, t2 };
+        }
     }
 }

@@ -146,6 +146,13 @@ namespace Joiner
             }
 
             var rules = JoinParser.ParseCustomRules(Properties.Settings.Default.CustomRules);
+            foreach (var rule in rules)
+            {
+                foreach (var t in rule.AllTables())
+                {
+                    tableAccessor.ResolveTable(t);
+                }
+            }
             foreach (var contextDatabase in contextDatabases)
             {
                 rules.AddRange(tableAccessor.GetForeignKeyRules(contextDatabase));
@@ -213,7 +220,7 @@ namespace Joiner
                         {
                             matched = matched.NewWithUniqueAlias(usedAliases);
                             string applied = context.hasGlue ? "" : "\njoin ";
-                            applied += matched.Def() + "\n  on ";
+                            applied += matched.Def(database) + "\n  on ";
                             applied += rule.Apply(table, matched);
                             options.Add(Tuple.Create(applied, rule.name, rule.priority));
                         }
