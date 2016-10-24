@@ -10,9 +10,9 @@ namespace Common
     public class Parser
     {
         static readonly Regex useDatabaseRegex = new Regex(String.Join("|", new string[] {
-            @"use\s+\[(?<db>[^\]]+)\]", // brackets identifier
-            @"use\s+""(?<db>[^""]+)""", // quoted identifier
-            @"use\s+(?<db>[a-zA-Z_@#][a-zA-Z_@#$0-9]*)", // regular identifier
+            @"\buse\s+\[(?<db>[^\]]+)\]", // brackets identifier
+            @"\buse\s+""(?<db>[^""]+)""", // quoted identifier
+            @"\buse\s+(?<db>[a-zA-Z_@#][a-zA-Z_@#$0-9]*)\b", // regular identifier
         }), RegexOptions.RightToLeft);
 
         public static string ParseUseDatabase(string text, int? atPos = null)

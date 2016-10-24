@@ -23,6 +23,10 @@ namespace Joiner
             connection.Connect();
             _server = new Server(connection);
             _defaultDatabase = defaultDatabase;
+            if (!_server.Databases.Contains(_defaultDatabase))
+            {
+                _defaultDatabase = Common.Connection.GetActiveDatabase(null);
+            }
             _dbForeignKeyRules = new Dictionary<string, List<Rule>>();
         }
 
@@ -114,6 +118,7 @@ join sys.columns refcol
         public List<Rule> GetForeignKeyRules(string database)
         {
             List<Rule> rules;
+            database = database ?? _defaultDatabase;
             if (!_dbForeignKeyRules.TryGetValue(database, out rules))
             {
                 rules = LoadForeignKeyRules(database);
