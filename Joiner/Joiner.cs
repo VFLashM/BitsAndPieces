@@ -145,7 +145,7 @@ namespace Joiner
                 contextDatabases.Add(t.Database());
             }
 
-            var rules = new List<Rule>();
+            var rules = JoinParser.ParseCustomRules(Properties.Settings.Default.CustomRules);
             foreach (var contextDatabase in contextDatabases)
             {
                 rules.AddRange(tableAccessor.GetForeignKeyRules(contextDatabase));

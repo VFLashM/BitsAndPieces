@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Opener
+namespace Common
 {
-    class Error : Exception
+    public class Error : Exception
     {
         private string _caption;
         public Error(string message, string caption = "Error")

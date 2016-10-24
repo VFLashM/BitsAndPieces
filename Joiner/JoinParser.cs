@@ -202,7 +202,7 @@ namespace Joiner
                 }
 
                 List<string> localTableColumns = null;
-                if (id.Count == 1 && localTables.ContainsKey(id[0]))
+                if (id.Count == 1 && localTables != null && localTables.ContainsKey(id[0]))
                 {
                     localTableColumns = localTables[id[0]];
                 }
@@ -333,6 +333,57 @@ namespace Joiner
                 }
             }
             return res;
+        }
+
+        static Rule ParseCustomRule(string body)
+        {
+            TableInfo t1;
+            if (!ConsumeTable(ref body, out t1, null))
+            {
+                throw new Common.Error("Unable to parse first table of custom rule:\n" + body);
+            }
+
+            string join;
+            if (!ConsumeWord(ref body, out join))
+            {
+                throw new Common.Error("Unable to parse 'join' of custom rule:\n" + body);
+            }
+            if (join.ToLower() != "join")
+            {
+                throw new Common.Error("'Join' keyword not found in custom rule:\n" + body);
+            }
+
+            TableInfo t2;
+            if (!ConsumeTable(ref body, out t2, null))
+            {
+                throw new Common.Error("Unable to parse second table of custom rule:\n" + body);
+            }
+
+            string on;
+            if (!ConsumeWord(ref body, out on))
+            {
+                throw new Common.Error("Unable to parse 'on' of custom rule:\n" + body);
+            }
+            if (join.ToLower() != "on")
+            {
+                throw new Common.Error("'On' keyword not found in custom rule:\n" + body);
+            }
+
+            return new Rule(t1, t2, body, "custom", 4);
+        }
+
+        public static List<Rule> ParseCustomRules(string body)
+        {
+            var rules = new List<Rule>();
+            foreach (var line in body.Split('\n'))
+            {
+                if (!String.IsNullOrWhiteSpace(line))
+                {
+                    var rule = ParseCustomRule(line);
+                    rules.Add(rule);
+                }
+            }
+            return rules;
         }
     }
 }

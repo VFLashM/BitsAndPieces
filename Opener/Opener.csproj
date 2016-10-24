@@ -105,7 +105,6 @@
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Error.cs" />
     <Compile Include="GoTo.cs" />
     <Compile Include="ObjectAccessor.cs" />
     <Compile Include="OpenedFileManager.cs" />

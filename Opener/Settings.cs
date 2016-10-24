@@ -21,7 +21,7 @@ namespace Opener.Properties {
                 Default.GetSchemas();
                 Default.Save();
             }
-            catch (Error e)
+            catch (Common.Error e)
             {
                 e.Show();
             }
@@ -32,7 +32,7 @@ namespace Opener.Properties {
             string rootPath = Environment.ExpandEnvironmentVariables(ProjectRoot);
             if (!System.IO.Path.IsPathRooted(rootPath))
             {
-                throw new Error("Project root path is not absolute:\n" + rootPath + "\n\nChange it in Tools->Options->Bits and Pieces->Opener", "Configuration error");
+                throw new Common.Error("Project root path is not absolute:\n" + rootPath + "\n\nChange it in Tools->Options->Bits and Pieces->Opener", "Configuration error");
             }
             return rootPath;
         }
@@ -44,7 +44,7 @@ namespace Opener.Properties {
             var result = parts.Select(db => db.Trim()).Where(s => !String.IsNullOrWhiteSpace(s)).ToList();
             if (result.Count == 0)
             {
-                throw new Error("No " + helpName + " specified\nList " + helpName + " in Tools->Options->Bits and Pieces->Opener", "Configuration error");
+                throw new Common.Error("No " + helpName + " specified\nList " + helpName + " in Tools->Options->Bits and Pieces->Opener", "Configuration error");
             }
             return result.ToArray();
         }

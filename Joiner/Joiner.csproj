@@ -118,14 +118,26 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Configuration.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Configuration.Designer.cs">
+      <DependentUpon>Configuration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ContextInfo.cs" />
     <Compile Include="Joiner.cs" />
     <Compile Include="JoinParser.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Rule.cs" />
     <Compile Include="RuleGenerator.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="TableAccessor.cs" />
     <Compile Include="TableInfo.cs" />
   </ItemGroup>
@@ -193,6 +205,18 @@
       <Project>{13A4E091-15E3-444E-B01F-73F71D707652}</Project>
       <Name>Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration.resx">
+      <DependentUpon>Configuration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>
