@@ -249,6 +249,7 @@ namespace Joiner
                 result = " " + result;
             }
             result = result.Replace("\n", "\n" + context.fromIndent);
+            result = result.Replace("\n", "\r\n"); // back to crlf
             textDoc.Selection.Insert(result);
             return true;
         }
