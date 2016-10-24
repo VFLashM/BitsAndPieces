@@ -21,7 +21,7 @@ namespace Joiner
             {
                 if (rule.condition != "")
                 {
-                    rule.condition += " and ";
+                    rule.condition += "\nand ";
                 }
                 rule.condition += rule.t1.Alias() + "." + c1 + " = " + rule.t2.Alias() + "." + c2;
             }

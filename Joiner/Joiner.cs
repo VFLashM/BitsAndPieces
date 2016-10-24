@@ -142,7 +142,7 @@ namespace Joiner
             foreach (TableInfo t in context.AllTables())
             {
                 tableAccessor.ResolveTable(t);
-                contextDatabases.Add(t.Database() ?? database);
+                contextDatabases.Add(t.Database());
             }
 
             var rules = new List<Rule>();
@@ -206,13 +206,18 @@ namespace Joiner
                         var matched = rule.Match(table);
                         if (matched != null)
                         {
-                            string applied = context.hasGlue ? "" : "join ";
-                            applied += matched.Def() + " on ";
+                            string applied = context.hasGlue ? "" : "\njoin ";
+                            applied += matched.Def() + "\non ";
                             applied += rule.Apply(table, matched);
                             options.Add(Tuple.Create(applied, rule.name));
                         }
                     }
                 }
+            }
+
+            if (options.Count == 0)
+            {
+                return false;
             }
 
             var items = new List<Common.ChooseItem.Item>();
@@ -223,7 +228,17 @@ namespace Joiner
 
             Common.ChooseItem dialog = new Common.ChooseItem(items.ToArray(), null);
             PlaceFormAtCaret(application, dialog);
-            dialog.ShowDialog();
+            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            {
+                return false;
+            }
+            string result = dialog.Result();
+
+            if (result.StartsWith("\n") && Regex.IsMatch(body, @"^.*\n\s*$"))
+            {
+                result = result.Substring(1);
+            }
+            textDoc.Selection.Insert(result);
 
             return context != null;
         }
