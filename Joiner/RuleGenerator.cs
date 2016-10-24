@@ -14,7 +14,7 @@ namespace Joiner
 
         static Rule CreateForPk(TableInfo t1, TableInfo t2, List<string> columns)
         {
-            var b = new Rule.Builder(t1, t2, "auto pk");
+            var b = new Rule.Builder(t1, t2, "auto key", 2);
             foreach (var col in columns)
             {
                 b.Add(col, col);
@@ -52,7 +52,7 @@ namespace Joiner
             {
                 foreach (var common in intersection)
                 {
-                    rules.Add(Rule.Builder.CreateSimple(t1, common, t2, common, "auto name"));
+                    rules.Add(Rule.Builder.CreateSimple(t1, common, t2, common, "auto name", 1));
                 }
             }
 

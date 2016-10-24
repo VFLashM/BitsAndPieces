@@ -103,7 +103,7 @@ join sys.columns refcol
                     lastFk = fkId;
                     baseTable = CreateTableInfo(database, FindTable(db, baseSchema, baseName));
                     refTable = CreateTableInfo(database, FindTable(db, refSchema, refName));
-                    builder = new Rule.Builder(baseTable, refTable, fkName);
+                    builder = new Rule.Builder(baseTable, refTable, "foreign key", 3);
                 }
                 builder.Add(baseColumn, refColumn);
             }

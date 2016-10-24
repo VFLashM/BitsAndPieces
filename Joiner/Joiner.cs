@@ -178,7 +178,7 @@ namespace Joiner
                 }
             }
 
-            var options = new List<Tuple<string, string>>();
+            var options = new List<Tuple<string, string, int>>();
             if (context.newTable != null)
             {
                 foreach (var rule in rules)
@@ -192,7 +192,7 @@ namespace Joiner
                             {
                                 applied = "\n  on " + applied;
                             }
-                            options.Add(Tuple.Create(applied, rule.name));
+                            options.Add(Tuple.Create(applied, rule.name, rule.priority));
                         }
                     }
                 }
@@ -215,7 +215,7 @@ namespace Joiner
                             string applied = context.hasGlue ? "" : "\njoin ";
                             applied += matched.Def() + "\n  on ";
                             applied += rule.Apply(table, matched);
-                            options.Add(Tuple.Create(applied, rule.name));
+                            options.Add(Tuple.Create(applied, rule.name, rule.priority));
                         }
                     }
                 }
@@ -229,7 +229,10 @@ namespace Joiner
             var items = new List<Common.ChooseItem.Item>();
             foreach (var option in options)
             {
-                items.Add(new Common.ChooseItem.Item(option.Item1, option.Item2));
+                var searchTerms = new List<Common.ChooseItem.SearchTerm>();
+                searchTerms.Add(new Common.ChooseItem.SearchTerm(option.Item1, option.Item3 + 100));
+                searchTerms.Add(new Common.ChooseItem.SearchTerm(option.Item2, option.Item3));
+                items.Add(new Common.ChooseItem.Item(option.Item1, option.Item2, searchTerms.ToArray()));
             }
 
             Common.ChooseItem dialog = new Common.ChooseItem(items.ToArray(), null);

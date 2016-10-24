@@ -12,16 +12,16 @@ namespace Joiner
         {
             private Rule rule;
 
-            public Builder(TableInfo t1, TableInfo t2, string name)
+            public Builder(TableInfo t1, TableInfo t2, string name, int priority)
             {
-                rule = new Rule(t1, t2, "", name);
+                rule = new Rule(t1, t2, "", name, priority);
             }
 
             public void Add(string c1, string c2)
             {
                 if (rule.condition != "")
                 {
-                    rule.condition += "\nand ";
+                    rule.condition += "\n and ";
                 }
                 rule.condition += rule.t1.Alias() + "." + c1 + " = " + rule.t2.Alias() + "." + c2;
             }
@@ -33,9 +33,9 @@ namespace Joiner
                 return res;
             }
 
-            public static Rule CreateSimple(TableInfo t1, string c1, TableInfo t2, string c2, string name)
+            public static Rule CreateSimple(TableInfo t1, string c1, TableInfo t2, string c2, string name, int priority)
             {
-                var builder = new Builder(t1, t2, name);
+                var builder = new Builder(t1, t2, name, priority);
                 builder.Add(c1, c2);
                 return builder.Finish();
             }
@@ -45,13 +45,15 @@ namespace Joiner
         TableInfo t2;
         string condition;
         public readonly string name;
+        public readonly int priority;
 
-        public Rule(TableInfo t1, TableInfo t2, string condition, string name)
+        public Rule(TableInfo t1, TableInfo t2, string condition, string name, int priority)
         {
             this.t1 = t1;
             this.t2 = t2;
             this.condition = condition;
             this.name = name;
+            this.priority = priority;
         }
 
         public TableInfo Match(TableInfo first)
