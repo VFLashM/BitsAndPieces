@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using Microsoft.SqlServer.Management.Smo;
+using System.Text.RegularExpressions;
 
 namespace Joiner
 {
@@ -94,6 +95,38 @@ namespace Joiner
                 return urn == other.urn;
             }
             return id == other.id;
+        }
+
+        static string MakeUnique(string value, List<string> others)
+        {
+            while (others.Contains(value))
+            {
+                var match = Regex.Match(value, @"([1-9][0-9]*)$");
+                if (match.Success)
+                {
+                    var number = Convert.ToInt32(match.Groups[1].Value);
+                    number += 1;
+                    value = value.Substring(0, value.Length - match.Length);
+                    value = value + number.ToString();
+                }
+                else
+                {
+                    value = value + "2";
+                }
+            }
+            return value;
+        }
+
+        internal TableInfo NewWithUniqueAlias(List<string> usedAliases)
+        {
+            var currentAlias = alias ?? TableAccessor.AliasFromName(id.Last());
+            var uniqueAlias = MakeUnique(currentAlias, usedAliases);
+
+            var res = new TableInfo(id, uniqueAlias);
+            res.urn = this.urn;
+            res.columns = this.columns;
+            res.primaryKey = this.primaryKey;
+            return res;
         }
     }
 }

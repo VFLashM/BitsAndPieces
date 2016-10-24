@@ -199,6 +199,11 @@ namespace Joiner
             }
             else
             {
+                var usedAliases = new List<string>();
+                foreach (var table in context.joinedTables)
+                {
+                    usedAliases.Add(table.Alias());
+                }
                 foreach (var rule in rules)
                 {
                     foreach (var table in context.joinedTables)
@@ -206,6 +211,7 @@ namespace Joiner
                         var matched = rule.Match(table);
                         if (matched != null)
                         {
+                            matched = matched.NewWithUniqueAlias(usedAliases);
                             string applied = context.hasGlue ? "" : "\njoin ";
                             applied += matched.Def() + "\n  on ";
                             applied += rule.Apply(table, matched);

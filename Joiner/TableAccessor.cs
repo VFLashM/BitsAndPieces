@@ -127,7 +127,7 @@ join sys.columns refcol
             return rules;
         }
 
-        public string AliasFromName(string name)
+        public static string AliasFromName(string name)
         {
             string alias = "";
             bool lastLower = true;

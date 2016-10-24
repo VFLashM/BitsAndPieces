@@ -13,7 +13,7 @@ namespace Common
             @"\buse\s+\[(?<db>[^\]]+)\]", // brackets identifier
             @"\buse\s+""(?<db>[^""]+)""", // quoted identifier
             @"\buse\s+(?<db>[a-zA-Z_@#][a-zA-Z_@#$0-9]*)\b", // regular identifier
-        }), RegexOptions.RightToLeft);
+        }), RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
 
         public static string ParseUseDatabase(string text, int? atPos = null)
         {
