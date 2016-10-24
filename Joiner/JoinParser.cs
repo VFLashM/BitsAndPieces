@@ -9,6 +9,7 @@ namespace Joiner
     class JoinParser
     {
         static readonly Regex fromRegex = new Regex(@"\bfrom\b\s*", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
+        static readonly Regex indentRegex = new Regex(@"([ \t]*).*$");
         static readonly Regex joinRegex = new Regex(@"\bjoin\b\s*", RegexOptions.IgnoreCase);
         static readonly Regex identifierRegex = new Regex("^(" + String.Join("|", new string[] {
             @"\[(?<id>[^\]]+)\]", // brackets identifier
@@ -121,11 +122,23 @@ namespace Joiner
 
         static public ContextInfo ParseContext(string body)
         {
-            Match match;
-            if (!ConsumeRegex(ref body, fromRegex, out match))
+            Match match = null;
+            foreach (Match trymatch in fromRegex.Matches(body))
+            {
+                match = trymatch;
+                if (match != null)
+                {
+                    break;
+                }
+            }
+            if (match == null)
             {
                 return null;
             }
+
+            var beforeFrom = body.Substring(0, match.Index);
+            string fromIndent = indentRegex.Match(beforeFrom).Groups[1].Value;
+            body = body.Substring(match.Index + match.Length);
 
             var tables = new List<TableInfo>();
             TableInfo newTable;
@@ -136,7 +149,7 @@ namespace Joiner
             tables.Add(newTable);
             if (whitespaceRegex.IsMatch(body))
             {
-                return new ContextInfo(tables, null, false);
+                return new ContextInfo(fromIndent, tables, null, false);
             }
             if (!ConsumeRegex(ref body, joinRegex, out match))
             {
@@ -147,7 +160,7 @@ namespace Joiner
             {
                 if (whitespaceRegex.IsMatch(body))
                 {
-                    return new ContextInfo(tables, null, true);
+                    return new ContextInfo(fromIndent, tables, null, true);
                 }
                 if (!ConsumeTable(ref body, out newTable))
                 {
@@ -155,7 +168,7 @@ namespace Joiner
                 }
                 if (whitespaceRegex.IsMatch(body))
                 {
-                    return new ContextInfo(tables, newTable, false);
+                    return new ContextInfo(fromIndent, tables, newTable, false);
                 }
                 if (!ConsumeRegex(ref body, onRegex, out match))
                 {
@@ -163,13 +176,13 @@ namespace Joiner
                 }
                 if (whitespaceRegex.IsMatch(body))
                 {
-                    return new ContextInfo(tables, newTable, true);
+                    return new ContextInfo(fromIndent, tables, newTable, true);
                 }
                 tables.Add(newTable);
             }
             while (ConsumeRegex(ref body, joinRegex, out match));
 
-            return new ContextInfo(tables, null, false);
+            return new ContextInfo(fromIndent, tables, null, false);
         }
 
         static List<ColumnDef> ParseTableColumns(string body)

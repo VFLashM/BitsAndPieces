@@ -190,7 +190,7 @@ namespace Joiner
                         {
                             if (!context.hasGlue)
                             {
-                                applied = "on " + applied;
+                                applied = "\n  on " + applied;
                             }
                             options.Add(Tuple.Create(applied, rule.name));
                         }
@@ -207,7 +207,7 @@ namespace Joiner
                         if (matched != null)
                         {
                             string applied = context.hasGlue ? "" : "\njoin ";
-                            applied += matched.Def() + "\non ";
+                            applied += matched.Def() + "\n  on ";
                             applied += rule.Apply(table, matched);
                             options.Add(Tuple.Create(applied, rule.name));
                         }
@@ -238,9 +238,13 @@ namespace Joiner
             {
                 result = result.Substring(1);
             }
+            if (!Regex.IsMatch(result, @"^\s") && !Regex.IsMatch(body, @"\s$"))
+            {
+                result = " " + result;
+            }
+            result = result.Replace("\n", "\n" + context.fromIndent);
             textDoc.Selection.Insert(result);
-
-            return context != null;
+            return true;
         }
     }
 }
