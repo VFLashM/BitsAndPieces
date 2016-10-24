@@ -95,7 +95,7 @@ namespace Joiner
         static bool ConsumeParens(ref string str)
         {
             Match match = openParenRegex.Match(str);
-            if (match != null)
+            if (match.Success)
             {
                 var outstr = str.Substring(match.Length);
                 if (ConsumeRegexBalanced(ref outstr, parenRegex, out match))
@@ -159,7 +159,7 @@ namespace Joiner
                         return false;
                     }
                 }
-                if (keywords.Contains(upperAlias))
+                else if (keywords.Contains(upperAlias))
                 {
                     str = srcStr;
                     alias = null;
