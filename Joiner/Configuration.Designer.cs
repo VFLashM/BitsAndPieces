@@ -44,18 +44,19 @@
             this.rulesText.Multiline = true;
             this.rulesText.Name = "rulesText";
             this.rulesText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.rulesText.Size = new System.Drawing.Size(605, 398);
+            this.rulesText.Size = new System.Drawing.Size(454, 321);
             this.rulesText.TabIndex = 0;
             this.rulesText.Text = global::Joiner.Properties.Settings.Default.CustomRules;
+            this.rulesText.WordWrap = false;
             // 
             // rulesLabel
             // 
             this.rulesLabel.AutoSize = true;
             this.rulesLabel.Location = new System.Drawing.Point(3, 6);
             this.rulesLabel.Name = "rulesLabel";
-            this.rulesLabel.Size = new System.Drawing.Size(94, 17);
+            this.rulesLabel.Size = new System.Drawing.Size(240, 17);
             this.rulesLabel.TabIndex = 1;
-            this.rulesLabel.Text = "Custom rules:";
+            this.rulesLabel.Text = "Custom rules (ctrl+enter for newline):";
             // 
             // Configuration
             // 
@@ -64,7 +65,7 @@
             this.Controls.Add(this.rulesLabel);
             this.Controls.Add(this.rulesText);
             this.Name = "Configuration";
-            this.Size = new System.Drawing.Size(611, 427);
+            this.Size = new System.Drawing.Size(460, 350);
             this.ResumeLayout(false);
             this.PerformLayout();
 
