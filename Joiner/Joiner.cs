@@ -234,7 +234,7 @@ namespace Joiner
             }
             string result = dialog.Result();
 
-            if (result.StartsWith("\n") && Regex.IsMatch(body, @"^.*\n\s*$"))
+            if (result.StartsWith("\n") && Regex.IsMatch(body, @"\n\s*$"))
             {
                 result = result.Substring(1);
             }

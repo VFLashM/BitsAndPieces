@@ -14,6 +14,10 @@ namespace Common
         public static string GetActiveDatabase(string text, int? atPos = null)
         {
             string currentDatabase = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo.AdvancedOptions["DATABASE"];
+            if (text == null)
+            {
+                return currentDatabase;
+            }
             return Parser.ParseUseDatabase(text, atPos) ?? currentDatabase;
         }
 
