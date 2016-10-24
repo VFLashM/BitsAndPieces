@@ -376,8 +376,14 @@ namespace Joiner
         public static List<Rule> ParseCustomRules(string body)
         {
             var rules = new List<Rule>();
-            foreach (var line in body.Split('\n'))
+            foreach (var iterLine in body.Split('\n'))
             {
+                var line = iterLine;
+                int commentStart = line.IndexOf("--");
+                if (commentStart >= 0)
+                {
+                    line = line.Substring(0, commentStart);
+                }
                 if (!String.IsNullOrWhiteSpace(line))
                 {
                     var rule = ParseCustomRule(line);
