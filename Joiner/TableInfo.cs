@@ -25,12 +25,12 @@ namespace Joiner
 
         public string[] GetId()
         {
-            return id.ToArray();
+            return id != null ? id.ToArray() : null;
         }
 
         public string Database()
         {
-            return id.Count >= 3 ? id[0] : null;
+            return (id != null && id.Count >= 3) ? id[0] : null;
         }
 
         public List<string> Columns()
@@ -61,6 +61,16 @@ namespace Joiner
                         this.primaryKey.Add(col.Name);
                     }
                 }
+            }
+        }
+
+        public void Bind(UserDefinedFunction udf)
+        {
+            this.urn = udf.Urn;
+            this.columns = new List<string>();
+            foreach (Column col in udf.Columns)
+            {
+                this.columns.Add(col.Name);
             }
         }
 
@@ -95,7 +105,11 @@ namespace Joiner
             {
                 return urn == other.urn;
             }
-            return id == other.id;
+            if (id != null || other.id != null)
+            {
+                return id == other.id;
+            }
+            return alias == other.alias;
         }
 
         static string MakeUnique(string value, List<string> others)

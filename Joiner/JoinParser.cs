@@ -11,19 +11,54 @@ namespace Joiner
         static readonly Regex fromRegex = new Regex(@"\bfrom\b\s*", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
         static readonly Regex indentRegex = new Regex(@"([ \t]*).*$");
         static readonly Regex joinRegex = new Regex(@"\bjoin\b\s*", RegexOptions.IgnoreCase);
-        static readonly Regex identifierRegex = new Regex("^(" + String.Join("|", new string[] {
+        static readonly Regex identifierRegex = new Regex(@"^\s*(" + String.Join("|", new string[] {
             @"\[(?<id>[^\]]+)\]", // brackets identifier
             @"""(?<id>[^""]+)""", // quoted identifier
             @"(?<id>[a-zA-Z_@#][a-zA-Z_@#$0-9]*)", // regular identifier
-        }) + ")");
-        static readonly Regex aliasRegex = new Regex(@"^\s+(?<as>as\s+)?(?<alias>[a-zA-Z_][a-zA-Z_0-9]*)", RegexOptions.IgnoreCase);
+        }) + @")\s*");
         static readonly Regex onRegex = new Regex(@"\bon\b\s*", RegexOptions.IgnoreCase);
         static readonly Regex whitespaceRegex = new Regex(@"^\s*$");
         static readonly Regex tableDefRegex = new Regex(
-            @"declare\s+(?<name>@[a-zA-Z_][a-zA-Z_0-9]*)\s+table\s*\(\s*" + "|" + // table var
-            @"create\s+table\s+(?<name>#*[a-zA-Z_][a-zA-Z_0-9]*)\s*\(\s*"         // regular table
+            @"declare\s+(?<name>@[a-zA-Z_][a-zA-Z_0-9]*)\s+table\s*" + "|" + // table var
+            @"create\s+table\s+(?<name>#*[a-zA-Z_][a-zA-Z_0-9]*)\s*"         // regular table
             , RegexOptions.IgnoreCase);
+        static readonly Regex openParenRegex = new Regex(@"^\s*\(");
+        static readonly Regex parenRegex = new Regex(@"\)\s*");
         static readonly Regex commaParenRegex = new Regex(@"([),])\s*");
+        static readonly string[] keywords = new string[] {
+            "ABSOLUTE", "EXEC", "OVERLAPS", "ACTION", "EXECUTE", "PAD", "ADA", "EXISTS", 
+            "PARTIAL", "ADD", "EXTERNAL", "PASCAL", "ALL", "EXTRACT", "POSITION", 
+            "ALLOCATE", "FALSE", "PRECISION", "ALTER", "FETCH", "PREPARE", "AND", 
+            "FIRST", "PRESERVE", "ANY", "FLOAT", "PRIMARY", "ARE", "FOR", "PRIOR", 
+            "AS", "FOREIGN", "PRIVILEGES", "ASC", "FORTRAN", "PROCEDURE", "ASSERTION", 
+            "FOUND", "PUBLIC", "AT", "FROM", "READ", "AUTHORIZATION", "FULL", "REAL", 
+            "AVG", "GET", "REFERENCES", "BEGIN", "GLOBAL", "RELATIVE", "BETWEEN", "GO", 
+            "RESTRICT", "BIT", "GOTO", "REVOKE", "BIT_LENGTH", "GRANT", "RIGHT", "BOTH", 
+            "GROUP", "ROLLBACK", "BY", "HAVING", "ROWS", "CASCADE", "HOUR", "SCHEMA", 
+            "CASCADED", "IDENTITY", "SCROLL", "CASE", "IMMEDIATE", "SECOND", "CAST", "IN", 
+            "SECTION", "CATALOG", "INCLUDE", "SELECT", "CHAR", "INDEX", "SESSION", 
+            "CHAR_LENGTH", "INDICATOR", "SESSION_USER", "CHARACTER", "INITIALLY", "SET", 
+            "CHARACTER_LENGTH", "INNER", "SIZE", "CHECK", "INPUT", "SMALLINT", "CLOSE", 
+            "INSENSITIVE", "SOME", "COALESCE", "INSERT", "SPACE", "COLLATE", "INT", "SQL", 
+            "COLLATION", "INTEGER", "SQLCA", "COLUMN", "INTERSECT", "SQLCODE", "COMMIT", 
+            "INTERVAL", "SQLERROR", "CONNECT", "INTO", "SQLSTATE", "CONNECTION", "IS", 
+            "SQLWARNING", "CONSTRAINT", "ISOLATION", "SUBSTRING", "CONSTRAINTS", "JOIN", 
+            "SUM", "CONTINUE", "KEY", "SYSTEM_USER", "CONVERT", "LANGUAGE", "TABLE", 
+            "CORRESPONDING", "LAST", "TEMPORARY", "COUNT", "LEADING", "THEN", "CREATE", 
+            "LEFT", "TIME", "CROSS", "LEVEL", "TIMESTAMP", "CURRENT", "LIKE", "TIMEZONE_HOUR", 
+            "CURRENT_DATE", "LOCAL", "TIMEZONE_MINUTE", "CURRENT_TIME", "LOWER", "TO", 
+            "CURRENT_TIMESTAMP", "MATCH", "TRAILING", "CURRENT_USER", "MAX", "TRANSACTION", 
+            "CURSOR", "MIN", "TRANSLATE", "DATE", "MINUTE", "TRANSLATION", "DAY", "MODULE", 
+            "TRIM", "DEALLOCATE", "MONTH", "TRUE", "DEC", "NAMES", "UNION", "DECIMAL", 
+            "NATIONAL", "UNIQUE", "DECLARE", "NATURAL", "UNKNOWN", "DEFAULT", "NCHAR", 
+            "UPDATE", "DEFERRABLE", "NEXT", "UPPER", "DEFERRED", "NO", "USAGE", "DELETE", 
+            "NONE", "USER", "DESC", "NOT", "USING", "DESCRIBE", "NULL", "VALUE", "DESCRIPTOR", 
+            "NULLIF", "VALUES", "DIAGNOSTICS", "NUMERIC", "VARCHAR", "DISCONNECT", "OCTET_LENGTH", 
+            "VARYING", "DISTINCT", "OF", "VIEW", "DOMAIN", "ON", "WHEN", "DOUBLE", "ONLY", 
+            "WHENEVER", "DROP", "OPEN", "WHERE", "ELSE", "OPTION", "WITH", "END", "OR", 
+            "WORK", "END-EXEC", "ORDER", "WRITE", "ESCAPE", "OUTER", "YEAR", "EXCEPT", 
+            "OUTPUT", "ZONE", "EXCEPTION",
+        };
 
         static bool IsBalanced(string str, int from, int to)
         {
@@ -57,36 +92,20 @@ namespace Joiner
             return false;
         }
 
-        /*
         static bool ConsumeParens(ref string str)
         {
-            if (!str.StartsWith("("))
+            Match match = openParenRegex.Match(str);
+            if (match != null)
             {
-                return false;
-            }
-            int offset = 0;
-            int balance = 0;
-            while (offset < str.Length)
-            {
-                switch (str[offset])
+                var outstr = str.Substring(match.Length);
+                if (ConsumeRegexBalanced(ref outstr, parenRegex, out match))
                 {
-                    case ')':
-                        balance -= 1;
-                        break;
-                    case '(':
-                        balance += 1;
-                        break;
-                }
-                offset += 1;
-                if (balance == 0)
-                {
-                    str = str.Substring(offset);
+                    str = outstr;
                     return true;
                 }
             }
-            return false;
+            return false;            
         }
-         */
 
         static bool ConsumeId(ref string str, out List<String> id)
         {
@@ -119,36 +138,87 @@ namespace Joiner
             }
         }
 
-        static bool ConsumeTable(ref string str, out TableInfo table, Dictionary<string, List<string>> localTables)
+        static bool ConsumeWord(ref string str, out string word)
         {
-            List<string> id;
-            if (!ConsumeId(ref str, out id))
-            {
-                table = null;
-                return false;
-            }
-
-            List<string> localTableColumns = null;
-            if (id.Count == 1 && localTables.ContainsKey(id[0]))
-            {
-                localTableColumns = localTables[id[0]];
-            }
-
             Match match;
-            string alias = null;
-            string beforeAliasStr = str;    
-            if (ConsumeRegexBalanced(ref str, aliasRegex, out match))
+            bool matched = ConsumeRegexBalanced(ref str, identifierRegex, out match);
+            word = matched ? match.Groups["id"].Value : null;
+            return matched;
+        }
+
+        static bool ConsumeAlias(ref string str, out string alias)
+        {
+            var srcStr = str;
+            if (ConsumeWord(ref str, out alias))
             {
-                alias = match.Groups["alias"].Value;
-                if (!match.Groups["as"].Success && (alias.ToLower() == "join" || alias.ToLower() == "on"))
+                var upperAlias = alias.ToUpper();
+                if (upperAlias == "AS")
                 {
-                    str = beforeAliasStr;
+                    if (!ConsumeWord(ref str, out alias))
+                    {
+                        return false;
+                    }
+                }
+                if (keywords.Contains(upperAlias))
+                {
+                    str = srcStr;
                     alias = null;
                 }
             }
-
-            table = new TableInfo(id, alias, localTableColumns);
             return true;
+        }
+
+        static bool ConsumeTable(ref string str, out TableInfo table, Dictionary<string, List<string>> localTables)
+        {
+            if (ConsumeParens(ref str)) // subquery
+            {
+                string alias;
+                if (!ConsumeAlias(ref str, out alias))
+                {
+                    table = null;
+                    return false;
+                }
+
+                List<string> columns = null;
+                if (openParenRegex.IsMatch(str))
+                {
+                    if (!ConsumeTableColumns(ref str, out columns))
+                    {
+                        table = null;
+                        return false;
+                    }
+                }
+
+                table = new TableInfo(null, alias, columns);
+                return true;
+            }
+            else
+            {
+                List<string> id;
+                if (!ConsumeId(ref str, out id))
+                {
+                    table = null;
+                    return false;
+                }
+
+                List<string> localTableColumns = null;
+                if (id.Count == 1 && localTables.ContainsKey(id[0]))
+                {
+                    localTableColumns = localTables[id[0]];
+                }
+
+                ConsumeParens(ref str); // for stored procs
+
+                string alias;
+                if (!ConsumeAlias(ref str, out alias))
+                {
+                    table = null;
+                    return false;
+                }
+
+                table = new TableInfo(id, alias, localTableColumns);
+                return true;
+            }
         }
 
         static public ContextInfo ParseContext(string body)
@@ -156,9 +226,9 @@ namespace Joiner
             Match match = null;
             foreach (Match trymatch in fromRegex.Matches(body))
             {
-                match = trymatch;
-                if (match != null)
+                if (IsBalanced(body, trymatch.Index, body.Length))
                 {
+                    match = trymatch;
                     break;
                 }
             }
@@ -218,12 +288,17 @@ namespace Joiner
             return new ContextInfo(fromIndent, tables, null, false);
         }
 
-        static List<string> ParseTableColumns(string body)
+        static bool ConsumeTableColumns(ref string body, out List<string> columns)
         {
-            var columns = new List<string>();
+            Match match;
+            if (!ConsumeRegexBalanced(ref body, openParenRegex, out match))
+            {
+                columns = null;
+                return false;
+            }
+            columns = new List<string>();
             while (true)
             {
-                Match match;
                 if (ConsumeRegexBalanced(ref body, identifierRegex, out match))
                 {
                     columns.Add(match.Groups["id"].Value);
@@ -233,9 +308,14 @@ namespace Joiner
                         {
                             continue;
                         }
+                        else
+                        {
+                            return true;
+                        }
                     }
                 }
-                return columns;
+                columns = null;
+                return false;
             }
         }
 
@@ -246,8 +326,8 @@ namespace Joiner
             {
                 var name = match.Groups["name"].Value;
                 var def = body.Substring(match.Index + match.Length);
-                var columns = ParseTableColumns(def);
-                if (columns != null)
+                List<string> columns;
+                if (ConsumeTableColumns(ref def, out columns))
                 {
                     res[name] = columns;
                 }

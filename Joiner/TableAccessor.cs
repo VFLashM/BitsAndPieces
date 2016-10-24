@@ -49,6 +49,18 @@ namespace Joiner
             return null;
         }
 
+        UserDefinedFunction FindFunction(Database db, string schema, string name)
+        {
+            foreach (UserDefinedFunction udf in db.UserDefinedFunctions)
+            {
+                if ((name == udf.Name) && (String.IsNullOrEmpty(schema) || (udf.Schema == schema)))
+                {
+                    return udf;
+                }
+            }
+            return null;
+        }
+
         List<Rule> LoadForeignKeyRules(string database)
         {
             var rules = new List<Rule>();
@@ -178,6 +190,10 @@ join sys.columns refcol
             string database = _defaultDatabase;
             string schema = null;
             var id = t.GetId();
+            if (id == null)
+            {
+                return false;
+            }
             if (id.Length > 2)
             {
                 database = id[0];
@@ -185,11 +201,20 @@ join sys.columns refcol
             }
 
             Database db = _server.Databases[database];
-            TableViewBase tab = FindTable(db, schema, id.Last());
+            var tab = FindTable(db, schema, id.Last());
             if (tab != null)
             {
                 t.Bind(tab);
             }
+            else
+            {
+                var udf = FindFunction(db, schema, id.Last());
+                if (udf != null)
+                {
+                    t.Bind(udf);
+                }
+            }
+
             return tab != null;
         }
     }
