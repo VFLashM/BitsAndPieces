@@ -13,13 +13,14 @@ namespace Joiner
         private List<string> id;
         private Urn urn = null;
         private string alias;
-        private List<string> columns = null;
+        private List<string> columns;
         private List<string> primaryKey = null;
 
-        public TableInfo(List<string> id, string alias)
+        public TableInfo(List<string> id, string alias, List<string> columns = null)
         {
             this.id = id;
             this.alias = alias;
+            this.columns = columns;
         }
 
         public string[] GetId()

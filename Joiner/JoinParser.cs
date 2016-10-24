@@ -20,20 +20,44 @@ namespace Joiner
         static readonly Regex onRegex = new Regex(@"\bon\b\s*", RegexOptions.IgnoreCase);
         static readonly Regex whitespaceRegex = new Regex(@"^\s*$");
         static readonly Regex tableDefRegex = new Regex(
-            @"declare\s+(?<name>@[a-zA-Z_][a-zA-Z_0-9]*)\s+table\s*" + "|" + // table var
-            @"create\s+table\s+(?<name>#+[a-zA-Z_][a-zA-Z_0-9]*)\s*"         // temp table
+            @"declare\s+(?<name>@[a-zA-Z_][a-zA-Z_0-9]*)\s+table\s*\(\s*" + "|" + // table var
+            @"create\s+table\s+(?<name>#*[a-zA-Z_][a-zA-Z_0-9]*)\s*\(\s*"         // regular table
             , RegexOptions.IgnoreCase);
+        static readonly Regex commaParenRegex = new Regex(@"([),])\s*");
 
-        static bool ConsumeRegex(ref string str, Regex regex, out Match match)
+        static bool IsBalanced(string str, int from, int to)
         {
-            match = regex.Match(str);
-            if (match.Success)
+            int pcount = 0;
+            for (int i = from; i < to; ++i)
             {
-                str = str.Substring(match.Index + match.Length);
+                if (str[i] == '(')
+                {
+                    pcount += 1;
+                }
+                else if (str[i] == ')')
+                {
+                    pcount -= 1;
+                }
             }
-            return match.Success;
+            return pcount == 0;
         }
 
+        static bool ConsumeRegexBalanced(ref string str, Regex regex, out Match outMatch)
+        {
+            foreach (Match match in regex.Matches(str))
+            {
+                if (IsBalanced(str, 0, match.Index))
+                {
+                    outMatch = match;
+                    str = str.Substring(match.Index + match.Length);
+                    return true;
+                }
+            }
+            outMatch = null;
+            return false;
+        }
+
+        /*
         static bool ConsumeParens(ref string str)
         {
             if (!str.StartsWith("("))
@@ -62,6 +86,7 @@ namespace Joiner
             }
             return false;
         }
+         */
 
         static bool ConsumeId(ref string str, out List<String> id)
         {
@@ -70,7 +95,7 @@ namespace Joiner
             while (true)
             {
                 Match match;
-                if (ConsumeRegex(ref str, identifierRegex, out match))
+                if (ConsumeRegexBalanced(ref str, identifierRegex, out match))
                 {
                     id.Add(match.Groups["id"].Value);
                     if (str.StartsWith("."))
@@ -84,7 +109,7 @@ namespace Joiner
                 }
                 else if (str.StartsWith("."))
                 {
-                    id.Add(null);
+                    id.Add("");
                     str = str.Substring(1);
                 }
                 else
@@ -94,7 +119,7 @@ namespace Joiner
             }
         }
 
-        static bool ConsumeTable(ref string str, out TableInfo table)
+        static bool ConsumeTable(ref string str, out TableInfo table, Dictionary<string, List<string>> localTables)
         {
             List<string> id;
             if (!ConsumeId(ref str, out id))
@@ -103,10 +128,16 @@ namespace Joiner
                 return false;
             }
 
+            List<string> localTableColumns = null;
+            if (id.Count == 1 && localTables.ContainsKey(id[0]))
+            {
+                localTableColumns = localTables[id[0]];
+            }
+
             Match match;
             string alias = null;
             string beforeAliasStr = str;    
-            if (ConsumeRegex(ref str, aliasRegex, out match))
+            if (ConsumeRegexBalanced(ref str, aliasRegex, out match))
             {
                 alias = match.Groups["alias"].Value;
                 if (!match.Groups["as"].Success && (alias.ToLower() == "join" || alias.ToLower() == "on"))
@@ -116,7 +147,7 @@ namespace Joiner
                 }
             }
 
-            table = new TableInfo(id, alias);
+            table = new TableInfo(id, alias, localTableColumns);
             return true;
         }
 
@@ -140,9 +171,11 @@ namespace Joiner
             string fromIndent = indentRegex.Match(beforeFrom).Groups[1].Value;
             body = body.Substring(match.Index + match.Length);
 
+            var localTables = ParseLocalTables(beforeFrom);
+
             var tables = new List<TableInfo>();
             TableInfo newTable;
-            if (!ConsumeTable(ref body, out newTable))
+            if (!ConsumeTable(ref body, out newTable, localTables))
             {
                 return null;
             }
@@ -151,7 +184,7 @@ namespace Joiner
             {
                 return new ContextInfo(fromIndent, tables, null, false);
             }
-            if (!ConsumeRegex(ref body, joinRegex, out match))
+            if (!ConsumeRegexBalanced(ref body, joinRegex, out match))
             {
                 return null;
             }
@@ -162,7 +195,7 @@ namespace Joiner
                 {
                     return new ContextInfo(fromIndent, tables, null, true);
                 }
-                if (!ConsumeTable(ref body, out newTable))
+                if (!ConsumeTable(ref body, out newTable, localTables))
                 {
                     return null;
                 }
@@ -170,7 +203,7 @@ namespace Joiner
                 {
                     return new ContextInfo(fromIndent, tables, newTable, false);
                 }
-                if (!ConsumeRegex(ref body, onRegex, out match))
+                if (!ConsumeRegexBalanced(ref body, onRegex, out match))
                 {
                     return null;
                 }
@@ -180,19 +213,35 @@ namespace Joiner
                 }
                 tables.Add(newTable);
             }
-            while (ConsumeRegex(ref body, joinRegex, out match));
+            while (ConsumeRegexBalanced(ref body, joinRegex, out match));
 
             return new ContextInfo(fromIndent, tables, null, false);
         }
 
-        static List<ColumnDef> ParseTableColumns(string body)
+        static List<string> ParseTableColumns(string body)
         {
-            return null;
+            var columns = new List<string>();
+            while (true)
+            {
+                Match match;
+                if (ConsumeRegexBalanced(ref body, identifierRegex, out match))
+                {
+                    columns.Add(match.Groups["id"].Value);
+                    if (ConsumeRegexBalanced(ref body, commaParenRegex, out match))
+                    {
+                        if (match.Groups[1].Value == ",")
+                        {
+                            continue;
+                        }
+                    }
+                }
+                return columns;
+            }
         }
 
-        static public Dictionary<string, List<ColumnDef>> ParseTables(string body)
+        static public Dictionary<string, List<string>> ParseLocalTables(string body)
         {
-            var res = new Dictionary<string, List<ColumnDef>>();
+            var res = new Dictionary<string, List<string>>();
             foreach (Match match in tableDefRegex.Matches(body))
             {
                 var name = match.Groups["name"].Value;
