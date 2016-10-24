@@ -34,7 +34,6 @@
             // 
             // rulesText
             // 
-            this.rulesText.AcceptsReturn = true;
             this.rulesText.AcceptsTab = true;
             this.rulesText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -54,9 +53,9 @@
             this.rulesLabel.AutoSize = true;
             this.rulesLabel.Location = new System.Drawing.Point(3, 6);
             this.rulesLabel.Name = "rulesLabel";
-            this.rulesLabel.Size = new System.Drawing.Size(240, 17);
+            this.rulesLabel.Size = new System.Drawing.Size(94, 17);
             this.rulesLabel.TabIndex = 1;
-            this.rulesLabel.Text = "Custom rules (ctrl+enter for newline):";
+            this.rulesLabel.Text = "Custom rules:";
             // 
             // Configuration
             // 
