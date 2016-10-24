@@ -125,7 +125,7 @@ namespace Joiner
 
             var editPoint = textDoc.StartPoint.CreateEditPoint();
             string text = editPoint.GetText(textDoc.EndPoint);
-            text = text.Replace("\r\n", "\n");
+            text = text.Replace(Environment.NewLine, "\n");
             int cursorPos = textDoc.Selection.ActivePoint.AbsoluteCharOffset - 1;
 
             string body = text.Substring(0, cursorPos);
@@ -259,7 +259,7 @@ namespace Joiner
                 result = " " + result;
             }
             result = result.Replace("\n", "\n" + context.fromIndent);
-            result = result.Replace("\n", "\r\n"); // back to crlf
+            result = result.Replace("\n", Environment.NewLine); // back to crlf
             textDoc.Selection.Insert(result);
             return true;
         }

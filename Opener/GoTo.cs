@@ -34,7 +34,7 @@ namespace Opener
 
             var editPoint = textDoc.StartPoint.CreateEditPoint();
             string text = editPoint.GetText(textDoc.EndPoint);
-            text = text.Replace("\r\n", "\n");
+            text = text.Replace(Environment.NewLine, "\n");
 
             int from = textDoc.Selection.ActivePoint.AbsoluteCharOffset - 1;
             while (from > 0 && IsId(text[from - 1]))
