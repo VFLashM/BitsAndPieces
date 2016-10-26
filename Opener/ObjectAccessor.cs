@@ -8,11 +8,52 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.Sdk.Sfc;
 using System.Collections.Specialized;
+using System.Data;
 
 namespace Opener
 {
     class ObjectAccessor
     {
+        Dictionary<string, string> typeUrnMap = new Dictionary<string, string>{
+            // objects
+            {"AGGREGATE_FUNCTION",               "UserDefinedAggregate"},
+            {"CHECK_CONSTRAINT",                 "Check"},
+            {"CLR_SCALAR_FUNCTION",              "UserDefinedFunction"},
+            {"CLR_STORED_PROCEDURE",             "StoredProcedure"},
+            {"CLR_TABLE_VALUED_FUNCTION",        "UserDefinedFunction"},
+            {"CLR_TRIGGER",                      "Trigger"},
+            {"DEFAULT_CONSTRAINT",               null /* "Column/Default" */}, // needs column name
+            {"EXTENDED_STORED_PROCEDURE",        "ExtendedStoredProcedure"},
+            {"FOREIGN_KEY_CONSTRAINT",           "ForeignKey"},
+            {"INTERNAL_TABLE",                   null}, // not accessible via urn
+            {"PLAN_GUIDE",                       "PlanGuide"},
+            {"PRIMARY_KEY_CONSTRAINT",           null}, // found as Index, but hangs IObjectExplorerService.FindNode
+            {"REPLICATION_FILTER_PROCEDURE",     null}, // is it useful ?
+            {"RULE",                             "Rule"},
+            {"SEQUENCE_OBJECT",                  "Sequence"},
+            {"SERVICE_QUEUE",                    null}, // is it useful ?
+            {"SQL_INLINE_TABLE_VALUED_FUNCTION", "UserDefinedFunction"},
+            {"SQL_SCALAR_FUNCTION",              "UserDefinedFunction"},
+            {"SQL_STORED_PROCEDURE",             "StoredProcedure"},
+            {"SQL_TABLE_VALUED_FUNCTION",        "UserDefinedFunction"},
+            {"SQL_TRIGGER",                      "Trigger"},
+            {"SYNONYM",                          "Synonym"},
+            {"SYSTEM_TABLE",                     null}, // not accessible via urn
+            {"TYPE_TABLE",                       null}, // found in sys.types
+            {"UNIQUE_CONSTRAINT",                null}, // found as Index, but hangs IObjectExplorerService.FindNode
+            {"USER_TABLE",                       "Table"},
+            {"VIEW",                             "View"},
+            
+            // indices
+            {"CLUSTERED_INDEX",                  "Index"},
+            {"NONCLUSTERED_INDEX",               "Index"},
+
+            // types
+            {"TABLE_TYPE",                       "UserDefinedTableType"},
+            {"CLR_TYPE",                         "UserDefinedType"},
+            {"DATA_TYPE",                        "UserDefinedDataType"},
+        };
+
         string _serverName;
         Server _server;
         Scripter _scripter;
@@ -42,34 +83,14 @@ namespace Opener
                 return res;
             }
 
-            public ObjectInfo(string database, NamedSmoObject obj, string type)
+            public ObjectInfo(string database, string schema, string name, string subname, Urn urn, string type)
             {
                 this.type = type;
                 this.database = database;
-                this.schema = null;
-                this.name = obj.Name;
-                this.subname = null;
-                this.urn = obj.Urn;
-                this.fullName = CreateFullName();
-            }
-            public ObjectInfo(string database, ScriptSchemaObjectBase obj, string type)
-            {
-                this.type = type;
-                this.database = database;
-                this.schema = obj.Schema;
-                this.name = obj.Name;
-                this.subname = null;
-                this.urn = obj.Urn;
-                this.fullName = CreateFullName();
-            }
-            public ObjectInfo(string database, ScriptSchemaObjectBase parent, NamedSmoObject subobj, string type)
-            {
-                this.type = type;
-                this.database = database;
-                this.schema = parent.Schema;
-                this.name = parent.Name;
-                this.subname = subobj.Name;
-                this.urn = subobj.Urn;
+                this.schema = schema;
+                this.name = name;
+                this.subname = subname;
+                this.urn = urn;
                 this.fullName = CreateFullName();
             }
         }
@@ -124,6 +145,43 @@ namespace Opener
                 ?? MatchObject(objects, name);
         }
 
+        public string CleanupObjectType(string type)
+        {
+            var res = type.ToLower().Replace('_', ' ');
+            var sqlPrefix = "sql ";
+            if (res.StartsWith(sqlPrefix))
+            {
+                res = res.Substring(sqlPrefix.Length);
+            }
+            return res;
+        }
+
+        public string AppendUrn(string urn, string type, string schema, string name)
+        {
+            if (urn == null)
+            {
+                return null;
+            }
+            if (!typeUrnMap.ContainsKey(type))
+            {
+                return null;
+            }
+            var urnType = typeUrnMap[type];
+            if (urnType == null)
+            {
+                return null;
+            }
+            if (schema != null)
+            {
+                urn += String.Format("/{0}[@Name='{1}' and @Schema='{2}']", urnType, name, schema);
+            }
+            else
+            {
+                urn += String.Format("/{0}[@Name='{1}']", urnType, name);
+            }
+            return urn;
+        }
+
         public List<ObjectInfo> GetObjects(string databaseHint = null, bool filterSchemas = true)
         {
             var result = new List<ObjectInfo>();
@@ -138,95 +196,88 @@ namespace Opener
                     {
                         continue;
                     }
-                    foreach (StoredProcedure obj in database.StoredProcedures)
+                    var dataSet = database.ExecuteWithResults(@"
+select SCHEMA_NAME(o.schema_id), o.name, o.type_desc,
+       SCHEMA_NAME(p.schema_id), p.name, p.type_desc
+from sys.objects o
+left outer join sys.objects p
+  on o.parent_object_id != 0 and o.parent_object_id = p.object_id
+
+union all
+
+select null, i.name, i.type_desc + '_INDEX',
+       SCHEMA_NAME(o.schema_id), o.name, o.type_desc
+from sys.indexes i
+join sys.objects o
+  on i.object_id = o.object_id
+where i.name is not null -- ignore heaps
+
+union all
+
+select SCHEMA_NAME(schema_id), name, case 
+        when is_table_type = 1 then 'TABLE_TYPE'
+        when is_assembly_type = 1 then 'CLR_TYPE'
+        else 'DATA_TYPE'
+    end,
+    null, null, null
+from sys.types
+where is_user_defined = 1
+");
+                    var table = dataSet.Tables[0];
+                    string baseUrn = String.Format("Server[@Name='{0}']/Database[@Name='{1}']", _server.NetName, database.Name);
+                    foreach (DataRow row in table.Rows)
                     {
-                        result.Add(new ObjectInfo(database.Name, obj, "procedure"));
-                    }
-                    foreach (UserDefinedFunction obj in database.UserDefinedFunctions)
-                    {
-                        // type detection is way too slow
-                        //string type = (obj.DataType == null) ? "table function" : "scalar function";
-                        result.Add(new ObjectInfo(database.Name, obj, "function"));
-                    }
-                    foreach (Table obj in database.Tables)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "table"));
-                        foreach (Trigger trig in obj.Triggers)
+                        string objSchema = row[0] as string;
+                        string objName = row[1] as string;
+                        string objType = row[2] as string;
+                        string parentSchema = row[3] as string;
+                        string parentName = row[4] as string;
+                        string parentType = row[5] as string;
+
+                        if (filterSchemas && !schemas.Contains(objSchema) && !schemas.Contains(parentSchema))
                         {
-                            result.Add(new ObjectInfo(database.Name, obj, trig, "trigger"));
+                            continue;
                         }
-                        /* somewhat useful, but slow everyhing down too much
-                        foreach (Index ind in obj.Indexes)
+
+                        string urn = baseUrn;
+                        if (parentName != null)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj, ind, "index"));
+                            urn = AppendUrn(urn, parentType, parentSchema, parentName);
                         }
-                        foreach (Check chk in obj.Checks)
+                        urn = AppendUrn(urn, objType, objSchema, objName);
+
+                        if (urn == null)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj, chk, "constraint"));
+                            continue;
                         }
-                        */
-                    }
-                    foreach (View obj in database.Views)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "view"));
-                        /* somewhat useful, but slow everyhing down too much
-                        foreach (Trigger trig in obj.Triggers)
+
+                        /*
+                        try
                         {
-                            result.Add(new ObjectInfo(database.Name, obj, trig, "view trigger"));
-                        }
-                        foreach (Index ind in obj.Indexes)
+                            var obj = _server.GetSmoObject(urn);
+                        } 
+                        catch (FailedOperationException e)
                         {
-                            result.Add(new ObjectInfo(database.Name, obj, ind, "view index"));
+                            foreach (DataRow drow in database.EnumObjects().Rows)
+                            {
+                                if ((drow[2] as string) == objName)
+                                {
+                                    var durn = drow[3] as Urn;
+                                }
+                            }
+                            continue;
                         }
                          */
+
+                        result.Add(new ObjectInfo(
+                            database.Name, 
+                            parentSchema ?? objSchema, 
+                            parentName ?? objName,
+                            parentName != null ? objName : null,
+                            urn != null ? new Urn(urn) : null,
+                            CleanupObjectType(objType)));
                     }
-                    foreach (UserDefinedTableType obj in database.UserDefinedTableTypes)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "table type"));
-                    }
-                    foreach (UserDefinedDataType obj in database.UserDefinedDataTypes)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "data type"));
-                    }
-                    foreach (UserDefinedType obj in database.UserDefinedTypes)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "clr type"));
-                    }
-                    foreach (ExtendedStoredProcedure obj in database.ExtendedStoredProcedures)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "extended procedure"));
-                    }
-                    foreach (UserDefinedAggregate obj in database.UserDefinedAggregates)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "aggregate"));
-                    }
-                    foreach (DatabaseDdlTrigger obj in database.Triggers)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "ddl trigger"));
-                    }
-                    /* these are not very useful it seems
-                    foreach (Rule obj in database.Rules)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "rule"));
-                    }
-                    foreach (SqlAssembly obj in database.Assemblies)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "assembly"));
-                    }
-                    foreach (Default obj in database.Defaults)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "default"));
-                    }
-                    foreach (PlanGuide obj in database.PlanGuides)
-                    {
-                        result.Add(new ObjectInfo(database.Name, obj, "plan guide"));
-                    }
-                     */
                 }
-            }
-            if (filterSchemas)
-            {
-                result.RemoveAll(item => item.schema != null && !schemas.Contains(item.schema));
             }
             return result;
         }
