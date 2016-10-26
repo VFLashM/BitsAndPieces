@@ -100,15 +100,15 @@ namespace Opener
         {
             foreach (var info in objects)
             {
-                string[] parts = info.name.Split('.');
-                string database = parts[0];
-                string objname = parts[parts.Length - 1];
-                string schema = parts.Length > 2 ? parts[1] : "";
-
-                if (name == info.name ||
-                    name == database + ".." + objname ||
-                    name == schema + "." + objname ||
-                    name == objname)
+                if (name == info.fullName ||
+                    name == info.subname ||
+                    (info.subname == null && (
+                        name == info.database + ".." + info.name ||
+                        name == info.schema + "." + info.name ||
+                        name == info.name
+                     )
+                    )
+                   )
                 {
                     return info;
                 }
@@ -118,13 +118,13 @@ namespace Opener
 
         public ObjectInfo FindObject(string name, string databaseHint)
         {
-            var objects = GetObjects();
+            var objects = GetObjects(databaseHint, false);
             return MatchObject(objects, databaseHint + "." + name) 
                 ?? MatchObject(objects, databaseHint + ".." + name)
                 ?? MatchObject(objects, name);
         }
 
-        public List<ObjectInfo> GetObjects()
+        public List<ObjectInfo> GetObjects(string databaseHint = null, bool filterSchemas = true)
         {
             var result = new List<ObjectInfo>();
             string[] databases = Properties.Settings.Default.GetDatabases();
@@ -132,8 +132,12 @@ namespace Opener
 
             foreach (Database database in _server.Databases)
             {
-                if (databases.Contains(database.Name) && database.IsAccessible)
+                if (databases.Contains(database.Name) || (database.Name == databaseHint))
                 {
+                    if (!database.IsAccessible)
+                    {
+                        continue;
+                    }
                     foreach (StoredProcedure obj in database.StoredProcedures)
                     {
                         result.Add(new ObjectInfo(database.Name, obj, "procedure"));
@@ -220,7 +224,10 @@ namespace Opener
                      */
                 }
             }
-            result.RemoveAll(item => item.schema != null && !schemas.Contains(item.schema));
+            if (filterSchemas)
+            {
+                result.RemoveAll(item => item.schema != null && !schemas.Contains(item.schema));
+            }
             return result;
         }
 
