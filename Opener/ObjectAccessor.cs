@@ -25,22 +25,22 @@ namespace Opener
             {"DEFAULT_CONSTRAINT",               null /* "Column/Default" */}, // needs column name
             {"EXTENDED_STORED_PROCEDURE",        "ExtendedStoredProcedure"},
             {"FOREIGN_KEY_CONSTRAINT",           "ForeignKey"},
-            {"INTERNAL_TABLE",                   null}, // not accessible via urn
+            {"INTERNAL_TABLE",                   null}, // apparently not accessible via urn
             {"PLAN_GUIDE",                       "PlanGuide"},
-            {"PRIMARY_KEY_CONSTRAINT",           null}, // found as Index, but hangs IObjectExplorerService.FindNode
-            {"REPLICATION_FILTER_PROCEDURE",     null}, // is it useful ?
+            {"PRIMARY_KEY_CONSTRAINT",           null}, // found as Index, but duplicated in sys.indexes
+            {"REPLICATION_FILTER_PROCEDURE",     null}, // apparently not accessible via urn
             {"RULE",                             "Rule"},
             {"SEQUENCE_OBJECT",                  "Sequence"},
-            {"SERVICE_QUEUE",                    null}, // is it useful ?
+            {"SERVICE_QUEUE",                    null /* "ServiceBroker/ServiceQueue" */}, // disabled as not useful
             {"SQL_INLINE_TABLE_VALUED_FUNCTION", "UserDefinedFunction"},
             {"SQL_SCALAR_FUNCTION",              "UserDefinedFunction"},
             {"SQL_STORED_PROCEDURE",             "StoredProcedure"},
             {"SQL_TABLE_VALUED_FUNCTION",        "UserDefinedFunction"},
             {"SQL_TRIGGER",                      "Trigger"},
             {"SYNONYM",                          "Synonym"},
-            {"SYSTEM_TABLE",                     null}, // not accessible via urn
-            {"TYPE_TABLE",                       null}, // found in sys.types
-            {"UNIQUE_CONSTRAINT",                null}, // found as Index, but hangs IObjectExplorerService.FindNode
+            {"SYSTEM_TABLE",                     null}, // apparently not accessible via urn
+            {"TYPE_TABLE",                       null}, // wrong name, correct version in sys.types
+            {"UNIQUE_CONSTRAINT",                null}, // found as Index, but duplicated in sys.indexes
             {"USER_TABLE",                       "Table"},
             {"VIEW",                             "View"},
             
@@ -243,6 +243,7 @@ where is_user_defined = 1
                         if (parentName != null)
                         {
                             urn = AppendUrn(urn, parentType, parentSchema, parentName);
+                            objSchema = null; // child obj schema confuses IObjectExplorerService.FindNode
                         }
                         urn = AppendUrn(urn, objType, objSchema, objName);
 
