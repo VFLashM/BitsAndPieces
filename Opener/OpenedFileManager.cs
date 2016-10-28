@@ -15,12 +15,29 @@ namespace Opener
     {
         private DTE2 _applicationObject;
         private Dictionary<string, Document> _openedDocuments = new Dictionary<string,Document>();
+        CommandEvents _executeEvents;
 
         public OpenedFileManager(DTE2 applicationObject)
         {
             _applicationObject = applicationObject;
             // does not work for some reason: _applicationObject.Events.DocumentEvents.DocumentClosing
-            _applicationObject.Events.WindowEvents.WindowClosing += new _dispWindowEvents_WindowClosingEventHandler(WindowEvents_WindowClosing); 
+            _applicationObject.Events.WindowEvents.WindowClosing += new _dispWindowEvents_WindowClosingEventHandler(WindowEvents_WindowClosing);
+
+            var executeCommand = _applicationObject.Commands.Item("Query.Execute");
+            _executeEvents = _applicationObject.Events.CommandEvents[executeCommand.Guid, executeCommand.ID];
+            _executeEvents.AfterExecute += new _dispCommandEvents_AfterExecuteEventHandler(executeSqlEvents_AfterExecute);
+        }
+
+        void executeSqlEvents_AfterExecute(string Guid, int ID, object CustomIn, object CustomOut)
+        {
+            if (_openedDocuments.ContainsValue(_applicationObject.ActiveDocument))
+            {
+                var textSelection = _applicationObject.ActiveDocument.Selection as TextSelection;
+                if (textSelection.IsEmpty)
+                {
+                    _applicationObject.ActiveDocument.Save();
+                }
+            }
         }
 
         void WindowEvents_WindowClosing(Window Window)
