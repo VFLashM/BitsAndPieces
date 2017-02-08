@@ -50,7 +50,7 @@ namespace Opener
             string result = choose.Result();
             Urn resultUrn = strToUrn[result];
             string body = accessor.GetObjectText(resultUrn);
-            openedFileManager.Open(result, resultUrn, body);
+            openedFileManager.Open(accessor.ServerName(), result, resultUrn, body);
             return true;
         }
     }

@@ -62,7 +62,7 @@ namespace Opener
             }
 
             string body = accessor.GetObjectText(info.urn);
-            openedFileManager.Open(info.name, info.urn, body);
+            openedFileManager.Open(accessor.ServerName(), info.fullName, info.urn, body);
             return true;
         }
     }

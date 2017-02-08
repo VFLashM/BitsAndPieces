@@ -65,10 +65,12 @@ namespace Opener
             }
         }
 
-        public void Open(string name, Urn urn, string text)
+        public void Open(string serverName, string fullName, Urn urn, string text)
         {
             string key = urn.ToString();
             IObjectExplorerService objExplorer = ServiceCache.ServiceProvider.GetService(typeof(IObjectExplorerService)) as IObjectExplorerService;
+            var test = ServiceCache.ServiceProvider.GetService(typeof(IObjectExplorerService)) as IObjectExplorerService;
+
             var node = objExplorer.FindNode(key);
             if (node != null)
             {
@@ -91,7 +93,7 @@ namespace Opener
                 {
                     fullPath += '\\';
                 }
-                fullPath += name.Replace('.', '\\').Replace(':', '_') + ".sql";
+                fullPath += serverName + '\\' + fullName.Replace('.', '\\').Replace(':', '_') + ".sql";
                 _applicationObject.ActiveDocument.Save(fullPath);
             }
         }
