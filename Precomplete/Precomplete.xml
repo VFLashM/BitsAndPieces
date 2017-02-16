@@ -4,6 +4,23 @@
         <name>Precomplete</name>
     </assembly>
     <members>
+        <member name="F:Precomplete.Configuration.components">
+            <summary> 
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Precomplete.Configuration.Dispose(System.Boolean)">
+            <summary> 
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Precomplete.Configuration.InitializeComponent">
+            <summary> 
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
         <member name="T:Precomplete.Connect">
             <summary>The object for implementing an Add-in.</summary>
             <seealso class='IDTExtensibility2' />
