@@ -45,10 +45,12 @@
             // 
             this.databasesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.databasesTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Precomplete.Properties.Settings.Default, "Databases", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.databasesTextBox.Location = new System.Drawing.Point(6, 29);
             this.databasesTextBox.Name = "databasesTextBox";
             this.databasesTextBox.Size = new System.Drawing.Size(415, 22);
             this.databasesTextBox.TabIndex = 1;
+            this.databasesTextBox.Text = global::Precomplete.Properties.Settings.Default.Databases;
             // 
             // Configuration
             // 

@@ -21,9 +21,8 @@ namespace Common
             return Parser.ParseUseDatabase(text, atPos) ?? currentDatabase;
         }
 
-        public static SqlConnectionInfo GetActiveConnectionInfo()
+        public static SqlConnectionInfo GetConnectionInfo(UIConnectionInfo uiConnectionInfo)
         {
-            UIConnectionInfo uiConnectionInfo = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
             SqlConnectionInfo connectionInfo = new SqlConnectionInfo();
             connectionInfo.ApplicationName = "SSMS Plugin Bits and Pieces";
             connectionInfo.ServerName = uiConnectionInfo.ServerName;
@@ -31,6 +30,12 @@ namespace Common
             connectionInfo.Password = uiConnectionInfo.Password;
             connectionInfo.UseIntegratedSecurity = String.IsNullOrEmpty(uiConnectionInfo.Password);
             return connectionInfo;
+        }
+
+        public static SqlConnectionInfo GetActiveConnectionInfo()
+        {
+            UIConnectionInfo uiConnectionInfo = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
+            return GetConnectionInfo(uiConnectionInfo);
         }
     }
 }

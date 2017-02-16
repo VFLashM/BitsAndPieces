@@ -26,10 +26,6 @@ namespace Precomplete.Properties {
             char[] separators = { ',' };
             var parts = text.Split(separators).ToList();
             var result = parts.Select(db => db.Trim()).Where(s => !String.IsNullOrWhiteSpace(s)).ToList();
-            if (result.Count == 0)
-            {
-                throw new Common.Error("No " + helpName + " specified\nList " + helpName + " in Tools->Options->Bits and Pieces->Opener", "Configuration error");
-            }
             return result.ToArray();
         }
 
