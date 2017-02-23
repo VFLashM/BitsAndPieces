@@ -66,6 +66,11 @@ namespace Precomplete
                     {
                         databaseInfo.tables[table.Name] = table.Schema;
                     }
+                    foreach (View view in database.Views)
+                    {
+                        // views are indistinguishable from tables in preloader's context
+                        databaseInfo.tables[view.Name] = view.Schema;
+                    }
                     foreach (UserDefinedFunction function in database.UserDefinedFunctions)
                     {
                         databaseInfo.functions[function.Name] = function.Schema;
