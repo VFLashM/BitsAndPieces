@@ -13,9 +13,9 @@ namespace Precomplete
 {
     class Precomplete
     {
-        static readonly Regex wordRegex = new Regex(@"[^.@]\b([a-zA-Z_@#][a-zA-Z_@#$0-9]*)\s*[(]?$", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
-        static readonly Regex fromJoinRegex = new Regex(@"(from|join)\s([a-zA-Z_@#][a-zA-Z_@#$0-9]*)\s*[(]?$", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
-        static readonly Regex execRegex = new Regex(@"\bexec\s([a-zA-Z_@#][a-zA-Z_@#$0-9]*)\s*$", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
+        static readonly Regex wordRegex = new Regex(@"[^.@]\b([a-zA-Z_#][a-zA-Z_#$0-9]*\.)?([a-zA-Z_#][a-zA-Z_#$0-9]*)\s*[(]?$", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
+        static readonly Regex fromJoinRegex = new Regex(@"(from|join)\s([a-zA-Z_#][a-zA-Z_#$0-9]*\.)?([a-zA-Z_#][a-zA-Z_#$0-9]*)\s*[(]?$", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
+        static readonly Regex execRegex = new Regex(@"\bexec\s([a-zA-Z_#][a-zA-Z_#$0-9]*\.)?([a-zA-Z_#][a-zA-Z_#$0-9]*)\s*$", RegexOptions.RightToLeft | RegexOptions.IgnoreCase);
 
         private class DatabaseInfo
         {
@@ -124,11 +124,13 @@ namespace Precomplete
             {
                 return;
             }
-            var wordGroup = wordMatch.Groups[1];
-            string word = wordGroup.Value;
+            string wordSchema = wordMatch.Groups[1].Value;
+            string word = wordMatch.Groups[2].Value;
+            var group = wordMatch.Groups[1].Success ? wordMatch.Groups[1] : wordMatch.Groups[2];
 
             string prependDb = null;
             string prependSchema = null;
+            bool prependSchemaIgnore = false;
             if (fromJoinRegex.Match(text).Success)
             {
                 foreach (var db in serverInfo.databases)
@@ -139,7 +141,7 @@ namespace Precomplete
                         {
                             prependDb = db.Key;
                             prependSchema = db.Value.tables[word];
-                            if (prependSchema == "dbo") prependSchema = "";
+                            prependSchemaIgnore = prependSchema == "dbo";
                             break;
                         }
                     }
@@ -155,7 +157,7 @@ namespace Precomplete
                         {
                             prependDb = db.Key;
                             prependSchema = db.Value.procedures[word];
-                            if (prependSchema == "dbo") prependSchema = "";
+                            prependSchemaIgnore = prependSchema == "dbo";
                             break;
                         }
                     }
@@ -180,12 +182,26 @@ namespace Precomplete
             }
             if (prependSchema != null)
             {
-                prependText += prependSchema + ".";
+                if (!String.IsNullOrEmpty(wordSchema))
+                {
+                    if ((prependSchema + '.') != wordSchema)
+                    {
+                        return;
+                    }
+                }
+                else 
+                {
+                    if (!prependSchemaIgnore)
+                    {
+                        prependText += prependSchema;
+                    }
+                    prependText += ".";
+                }
             }
             if (prependText != "")
             {
                 var editPoint = textDoc.CreateEditPoint();
-                editPoint.MoveToAbsoluteOffset(wordGroup.Index + 1);
+                editPoint.MoveToAbsoluteOffset(group.Index + 1);
                 editPoint.Insert(prependText);
             }
         }
