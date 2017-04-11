@@ -20,8 +20,11 @@ namespace Precomplete
         private class DatabaseInfo
         {
             public Dictionary<string, string> tables = new Dictionary<string, string>();
+            public Dictionary<string, string> tablesLower = new Dictionary<string, string>();
             public Dictionary<string, string> functions = new Dictionary<string, string>();
+            public Dictionary<string, string> functionsLower = new Dictionary<string, string>();
             public Dictionary<string, string> procedures = new Dictionary<string, string>();
+            public Dictionary<string, string> proceduresLower = new Dictionary<string, string>();
         }
         private class ServerInfo
         {
@@ -65,19 +68,23 @@ namespace Precomplete
                     foreach (Table table in database.Tables)
                     {
                         databaseInfo.tables[table.Name] = table.Schema;
+                        databaseInfo.tablesLower[table.Name.ToLower()] = table.Name;
                     }
                     foreach (View view in database.Views)
                     {
                         // views are indistinguishable from tables in preloader's context
                         databaseInfo.tables[view.Name] = view.Schema;
+                        databaseInfo.tablesLower[view.Name.ToLower()] = view.Name;
                     }
                     foreach (UserDefinedFunction function in database.UserDefinedFunctions)
                     {
                         databaseInfo.functions[function.Name] = function.Schema;
+                        databaseInfo.functionsLower[function.Name.ToLower()] = function.Name;
                     }
                     foreach (StoredProcedure proc in database.StoredProcedures)
                     {
                         databaseInfo.procedures[proc.Name] = proc.Schema;
+                        databaseInfo.proceduresLower[proc.Name.ToLower()] = proc.Name;
                     }
                     res.databases[database.Name] = databaseInfo;
                 }
@@ -97,6 +104,16 @@ namespace Precomplete
         public Precomplete()
         {
             
+        }
+
+        static public V DictGet<K, V>(Dictionary<K, V> dict, K key, V def)
+        {
+            V val;
+            if (dict.TryGetValue(key, out val))
+            {
+                return val;
+            }
+            return def;
         }
 
         public void Apply(TextDocument textDoc, TextPoint startPoint, TextPoint endPoint)
@@ -125,7 +142,8 @@ namespace Precomplete
                 return;
             }
             string wordSchema = wordMatch.Groups[1].Value;
-            string word = wordMatch.Groups[2].Value;
+            string matchedWord = wordMatch.Groups[2].Value;
+            string word = matchedWord;
             var group = wordMatch.Groups[1].Success ? wordMatch.Groups[1] : wordMatch.Groups[2];
 
             string prependDb = null;
@@ -135,9 +153,11 @@ namespace Precomplete
             {
                 foreach (var db in serverInfo.databases)
                 {
+                    word = DictGet(db.Value.tablesLower, word, word);
                     if (db.Key != activeDatabase)
                     {
-                        if (db.Value.tables.ContainsKey(word))
+                        string cword = DictGet(db.Value.tablesLower, word, word);
+                        if (db.Value.tables.ContainsKey(cword))
                         {
                             prependDb = db.Key;
                             prependSchema = db.Value.tables[word];
@@ -151,6 +171,7 @@ namespace Precomplete
             {
                 foreach (var db in serverInfo.databases)
                 {
+                    word = DictGet(db.Value.proceduresLower, word, word);
                     if (db.Key != activeDatabase)
                     {
                         if (db.Value.procedures.ContainsKey(word))
@@ -167,6 +188,7 @@ namespace Precomplete
             {
                 foreach (var db in serverInfo.databases)
                 {
+                    word = DictGet(db.Value.functionsLower, word, word);
                     if (db.Value.functions.ContainsKey(word))
                     {
                         prependDb = db.Key;
@@ -174,6 +196,13 @@ namespace Precomplete
                         break;
                     }
                 }
+            }
+            if (word != matchedWord)
+            {
+                var editPoint = textDoc.CreateEditPoint();
+                editPoint.MoveToAbsoluteOffset(wordMatch.Groups[2].Index + 1);
+                editPoint.Delete(wordMatch.Groups[2].Length);
+                editPoint.Insert(word);
             }
             string prependText = "";
             if (prependDb != null)
